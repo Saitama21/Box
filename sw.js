@@ -1,4 +1,4 @@
-const VERSION = '3.1.0';
+const VERSION = '3.2.0';
 const CACHE = `box-pwa-v${VERSION}`;
 const APP_SHELL = [
   './',
