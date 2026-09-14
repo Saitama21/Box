@@ -8,11 +8,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Box" />
   <meta name="description" content="Offline-first калькулятор количества и габаритов укладки деталей." />
-  <link rel="manifest" href="./manifest.webmanifest?v=3.3.0" />
+  <link rel="manifest" href="./manifest.webmanifest?v=3.4.0" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="./icon.svg" />
-  <link rel="stylesheet" href="./styles.css?v=3.3.0" />
-  <link rel="stylesheet" href="./enhancements.css?v=3.3.0" />
+  <link rel="stylesheet" href="./styles.css?v=3.4.0" />
+  <link rel="stylesheet" href="./enhancements.css?v=3.4.0" />
   <title>Box — калькулятор укладки</title>
 </head>
 <body>
@@ -53,8 +53,9 @@
           <div class="field-grid three">
             <label><span>По длине (X)</span><input id="countX" type="number" min="1" max="999" step="1" value="9" inputmode="numeric" /></label>
             <label><span>По ширине (Y)</span><input id="countY" type="number" min="1" max="999" step="1" value="5" inputmode="numeric" /></label>
-            <label><span>По высоте (Z)</span><input id="countZ" type="number" min="1" max="999" step="1" value="4" inputmode="numeric" /></label>
+            <label class="optional-z"><span>По высоте (Z) <small>необяз.</small></span><input id="countZ" type="number" min="1" max="999" step="1" value="" placeholder="1" inputmode="numeric" aria-label="По высоте Z, необязательно. Пустое поле означает один слой" /></label>
           </div>
+          <p class="optional-note">Z можно оставить пустым — тогда считаем один слой.</p>
         </section>
 
         <div class="sidebar-actions">
@@ -64,8 +65,8 @@
 
         <section class="mini-summary" aria-live="polite">
           <span>Итого</span>
-          <strong><b id="miniTotal">180</b> шт.</strong>
-          <small id="miniFormula">9 × 5 × 4</small>
+          <strong><b id="miniTotal">45</b> шт.</strong>
+          <small id="miniFormula">9 × 5 · 1 слой</small>
         </section>
       </aside>
 
@@ -78,34 +79,34 @@
           </article>
 
           <article class="projection-card">
-            <header><h3>Вид сбоку <span>(X × Z)</span></h3><b id="sideSize">450 × 80 мм</b></header>
+            <header><h3>Вид сбоку <span>(X × Z)</span></h3><b id="sideSize">450 × 20 мм</b></header>
             <div id="sideProjection" class="projection-stage" role="img" aria-label="Вид сбоку на детали"></div>
           </article>
 
           <article class="projection-card">
-            <header><h3>Вид с торца <span>(Y × Z)</span></h3><b id="endSize">250 × 80 мм</b></header>
+            <header><h3>Вид с торца <span>(Y × Z)</span></h3><b id="endSize">250 × 20 мм</b></header>
             <div id="endProjection" class="projection-stage" role="img" aria-label="Вид с торца на детали"></div>
           </article>
 
           <article class="projection-card preview-card">
-            <header><h3>Общий вид</h3><b id="previewLabel">180 деталей</b></header>
+            <header><h3>Общий вид</h3><b id="previewLabel">45 деталей · 1 слой</b></header>
             <div id="isoProjection" class="projection-stage" role="img" aria-label="Общий вид укладки деталей"></div>
           </article>
         </div>
 
         <section class="result-bar" aria-live="polite">
-          <div class="result-total"><span>Итого</span><strong><b id="totalCount">180</b> шт.</strong></div>
+          <div class="result-total"><span>Итого</span><strong><b id="totalCount">45</b> шт.</strong></div>
           <div class="result-copy">
             <p id="resultPart">Деталь: Ø50 × 20 мм</p>
-            <p id="resultLayout">Укладка: 9 × 5 × 4</p>
-            <p id="resultBlock">Габариты блока: 450 × 250 × 80 мм</p>
+            <p id="resultLayout">Укладка: 9 × 5 · 1 слой</p>
+            <p id="resultBlock">Габариты блока: 450 × 250 × 20 мм</p>
           </div>
           <button id="copyButton" class="copy-btn" type="button"><span aria-hidden="true">⧉</span><b>Скопировать</b></button>
         </section>
       </section>
     </main>
   </div>
-  <script src="./app.js?v=3.3.0" defer></script>
-  <script src="./enhancements.js?v=3.3.0" defer></script>
+  <script src="./app.js?v=3.4.0" defer></script>
+  <script src="./enhancements.js?v=3.4.0" defer></script>
 </body>
 </html>
