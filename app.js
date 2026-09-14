@@ -55,30 +55,41 @@
 
   const fmt = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
   const intFmt = new Intl.NumberFormat('ru-RU');
+  const numericInputs = [els.boxLength, els.boxWidth, els.boxHeight, els.partDiameter, els.partHeight, els.countX, els.countY, els.countZ];
 
-  function num(value, fallback = 1) {
-    const parsed = Number(String(value).trim().replace(',', '.'));
-    if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
-    return Math.min(5000, Math.round(parsed * 100) / 100);
+  function numberOrNull(value, max = 5000) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return null;
+    const parsed = Number(raw.replace(',', '.'));
+    if (!Number.isFinite(parsed) || parsed <= 0) return null;
+    return Math.min(max, Math.round(parsed * 100) / 100);
   }
 
-  function int(value, fallback = 1) {
-    const parsed = Math.trunc(Number(value));
-    if (!Number.isFinite(parsed) || parsed < 1) return fallback;
+  function countOrNull(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return null;
+    const parsed = Math.trunc(Number(raw));
+    if (!Number.isFinite(parsed) || parsed < 1) return null;
     return Math.min(MAX_COUNT, parsed);
   }
 
   function getState() {
     return {
       crateId: els.cratePreset.value,
-      boxLength: num(els.boxLength.value, DEFAULTS.boxLength),
-      boxWidth: num(els.boxWidth.value, DEFAULTS.boxWidth),
-      boxHeight: num(els.boxHeight.value, DEFAULTS.boxHeight),
-      partDiameter: num(els.partDiameter.value, DEFAULTS.partDiameter),
-      partHeight: num(els.partHeight.value, DEFAULTS.partHeight),
-      x: int(els.countX.value, DEFAULTS.x), y: int(els.countY.value, DEFAULTS.y), z: int(els.countZ.value, DEFAULTS.z)
+      boxLength: numberOrNull(els.boxLength.value),
+      boxWidth: numberOrNull(els.boxWidth.value),
+      boxHeight: numberOrNull(els.boxHeight.value),
+      partDiameter: numberOrNull(els.partDiameter.value, 3000),
+      partHeight: numberOrNull(els.partHeight.value, 3000),
+      x: countOrNull(els.countX.value), y: countOrNull(els.countY.value), z: countOrNull(els.countZ.value)
     };
   }
+
+  function hasBox(s) { return s.boxLength !== null && s.boxWidth !== null && s.boxHeight !== null; }
+  function hasPart(s) { return s.partDiameter !== null && s.partHeight !== null; }
+  function hasLayout(s) { return s.x !== null && s.y !== null && s.z !== null; }
+  function isComplete(s) { return hasBox(s) && hasPart(s) && hasLayout(s); }
+  function formatMaybe(value) { return value === null ? '—' : fmt.format(value); }
 
   function selectedCrate() { return CRATES.find(c => c.id === els.cratePreset.value) || null; }
   function crateName() { return selectedCrate()?.name || 'Свой размер'; }
@@ -116,13 +127,17 @@
 
   function applyState(s, includeCrate = true) {
     if (includeCrate && s.crateId) els.cratePreset.value = s.crateId;
-    els.boxLength.value = s.boxLength; els.boxWidth.value = s.boxWidth; els.boxHeight.value = s.boxHeight;
-    els.partDiameter.value = s.partDiameter; els.partHeight.value = s.partHeight;
-    els.countX.value = s.x; els.countY.value = s.y; els.countZ.value = s.z;
+    els.boxLength.value = s.boxLength ?? ''; els.boxWidth.value = s.boxWidth ?? ''; els.boxHeight.value = s.boxHeight ?? '';
+    els.partDiameter.value = s.partDiameter ?? ''; els.partHeight.value = s.partHeight ?? '';
+    els.countX.value = s.x ?? ''; els.countY.value = s.y ?? ''; els.countZ.value = s.z ?? '';
   }
 
   function matchCrateFromDimensions() {
-    const l = num(els.boxLength.value), w = num(els.boxWidth.value), h = num(els.boxHeight.value);
+    const l = numberOrNull(els.boxLength.value), w = numberOrNull(els.boxWidth.value), h = numberOrNull(els.boxHeight.value);
+    if (l === null || w === null || h === null) {
+      els.cratePreset.value = 'custom';
+      return;
+    }
     const match = CRATES.find(c => c.length === l && c.width === w && c.height === h);
     els.cratePreset.value = match ? match.id : 'custom';
   }
@@ -133,6 +148,10 @@
       els.boxLength.value = crate.length;
       els.boxWidth.value = crate.width;
       els.boxHeight.value = crate.height;
+    } else {
+      els.boxLength.value = '';
+      els.boxWidth.value = '';
+      els.boxHeight.value = '';
     }
     update();
   }
@@ -171,8 +190,7 @@
     if (vertical) {
       svg.append(svgEl('line', { x1: x1 - 9, y1, x2: x1 + 9, y2: y1, stroke: '#163f78', 'stroke-width': 1.4 }), svgEl('line', { x1: x2 - 9, y1: y2, x2: x2 + 9, y2, stroke: '#163f78', 'stroke-width': 1.4 }));
       const tx = x1 - 18, ty = (y1 + y2) / 2;
-      const text = svgEl('text', { x: tx, y: ty, class: 'dim-text', 'text-anchor': 'middle', transform: `rotate(-90 ${tx} ${ty})` }, label);
-      svg.append(text);
+      svg.append(svgEl('text', { x: tx, y: ty, class: 'dim-text', 'text-anchor': 'middle', transform: `rotate(-90 ${tx} ${ty})` }, label));
     } else {
       svg.append(svgEl('line', { x1, y1: y1 - 9, x2: x1, y2: y1 + 9, stroke: '#163f78', 'stroke-width': 1.4 }), svgEl('line', { x1: x2, y1: y2 - 9, x2, y2: y2 + 9, stroke: '#163f78', 'stroke-width': 1.4 }));
       svg.append(svgEl('text', { x: (x1 + x2) / 2, y: y1 - 10, class: 'dim-text', 'text-anchor': 'middle' }, label));
@@ -212,7 +230,6 @@
     });
     group.append(svgEl('path', { d: `M${outer.x + 8} ${outer.y + 13} H${outer.x + outer.w - 8}`, stroke: '#b5f1cf', 'stroke-width': 2.5, 'stroke-opacity': '.7' }));
     svg.append(group);
-    return outer;
   }
 
   function addTopParts(svg, defs, prefix, s, box, scale, overflow) {
@@ -225,8 +242,7 @@
     defs.append(pattern);
     const w = s.x * d, h = s.y * d;
     const x = box.x + (box.w - w) / 2, y = box.y + (box.h - h) / 2;
-    const parts = svgEl('rect', { x, y, width: w, height: h, fill: `url(#${patternId})`, stroke: overflow ? '#d54a4a' : '#6d7e8d', 'stroke-opacity': overflow ? '.95' : '.25', 'stroke-width': overflow ? 2 : .8 });
-    svg.append(parts);
+    svg.append(svgEl('rect', { x, y, width: w, height: h, fill: `url(#${patternId})`, stroke: overflow ? '#d54a4a' : '#6d7e8d', 'stroke-opacity': overflow ? '.95' : '.25', 'stroke-width': overflow ? 2 : .8 }));
   }
 
   function drawTop(s, fits) {
@@ -266,7 +282,7 @@
     svg.append(group);
   }
 
-  function addSideParts(svg, defs, prefix, s, box, scale, horizontalCount, endView, overflow) {
+  function addSideParts(svg, defs, prefix, s, box, scale, horizontalCount, overflow) {
     const cellW = Math.max(.25, s.partDiameter * scale);
     const cellH = Math.max(.25, s.partHeight * scale);
     const patternId = `${prefix}-cylPattern`;
@@ -287,12 +303,21 @@
     const defs = defsFor(svg, prefix);
     const fitted = fitRect(realW, s.boxHeight, 455, 200);
     const box = { x: 105 + (455 - fitted.w) / 2, y: 88 + (200 - fitted.h), w: fitted.w, h: fitted.h };
-    addSideParts(svg, defs, prefix, s, box, fitted.scale, horizontalCount, endView, !fits);
+    addSideParts(svg, defs, prefix, s, box, fitted.scale, horizontalCount, !fits);
     addSideCrate(svg, prefix, box, endView);
     addDimension(svg, prefix, { x1: box.x, y1: 48, x2: box.x + box.w, y2: 48, label: `${fmt.format(realW)} мм` });
     addDimension(svg, prefix, { x1: 62, y1: box.y, x2: 62, y2: box.y + box.h, label: `${fmt.format(s.boxHeight)} мм`, vertical: true });
     svg.append(svgEl('text', { x: 310, y: 318, class: 'note-text', 'text-anchor': 'middle' }, `${horizontalCount} по горизонтали · ${s.z} по высоте`));
     target.replaceChildren(svg);
+  }
+
+  function drawEmptyProjection(target, message) {
+    const svg = svgEl('svg', { viewBox: '0 0 620 260', preserveAspectRatio: 'xMidYMid meet', 'aria-hidden': 'true' });
+    svg.append(svgEl('rect', { x: 72, y: 45, width: 476, height: 170, rx: 18, fill: 'none', stroke: 'currentColor', 'stroke-opacity': '.18', 'stroke-width': 2, 'stroke-dasharray': '8 8' }));
+    svg.append(svgEl('text', { x: 310, y: 124, fill: 'currentColor', 'fill-opacity': '.52', 'font-size': 18, 'font-weight': 750, 'text-anchor': 'middle' }, 'Новый расчёт'));
+    svg.append(svgEl('text', { x: 310, y: 153, fill: 'currentColor', 'fill-opacity': '.42', 'font-size': 14, 'text-anchor': 'middle' }, message));
+    target.replaceChildren(svg);
+    target.setAttribute('aria-label', message);
   }
 
   function gaps(s) {
@@ -307,10 +332,25 @@
   function gapText(value) { return `${value < 0 ? '−' : ''}${fmt.format(Math.abs(value))} мм`; }
   function rowsWord(n) { const n10 = n % 10, n100 = n % 100; if (n10 === 1 && n100 !== 11) return 'ряд'; if ([2,3,4].includes(n10) && ![12,13,14].includes(n100)) return 'ряда'; return 'рядов'; }
 
+  function setStatusNeutral() {
+    els.fitStatus.classList.remove('is-fit', 'is-overflow');
+    els.fitStatus.style.background = 'var(--card)';
+    els.fitStatus.style.borderColor = 'var(--border)';
+    const icon = els.fitStatus.querySelector('.status-icon');
+    icon.textContent = '…';
+    icon.style.background = 'var(--muted)';
+    els.statusText.textContent = 'Заполните параметры';
+    els.gapLength.textContent = '—'; els.gapWidth.textContent = '—'; els.gapHeight.textContent = '—';
+  }
+
   function updateStatus(g, fits) {
+    els.fitStatus.style.background = '';
+    els.fitStatus.style.borderColor = '';
+    const icon = els.fitStatus.querySelector('.status-icon');
+    icon.style.background = '';
     els.fitStatus.classList.toggle('is-fit', fits);
     els.fitStatus.classList.toggle('is-overflow', !fits);
-    els.fitStatus.querySelector('.status-icon').textContent = fits ? '✓' : '!';
+    icon.textContent = fits ? '✓' : '!';
     els.statusText.textContent = fits ? 'Детали помещаются' : 'Укладка не помещается';
     els.gapLength.textContent = gapText(g.length); els.gapWidth.textContent = gapText(g.width); els.gapHeight.textContent = gapText(g.height);
   }
@@ -319,8 +359,35 @@
     return `${crateName()} — ${fmt.format(s.boxLength)}×${fmt.format(s.boxWidth)}×${fmt.format(s.boxHeight)} мм | Деталь Ø${fmt.format(s.partDiameter)}×${fmt.format(s.partHeight)} мм | Укладка ${s.x}×${s.y}×${s.z} | Всего ${intFmt.format(s.x * s.y * s.z)} шт`;
   }
 
+  function renderIncomplete(s) {
+    els.totalCount.textContent = '—';
+    els.resultFormula.textContent = 'Заполните поля';
+    els.infoBoxName.textContent = crateName();
+    els.infoBoxSize.textContent = `${formatMaybe(s.boxLength)} × ${formatMaybe(s.boxWidth)} × ${formatMaybe(s.boxHeight)} мм`;
+    els.infoPartSize.textContent = `Ø${formatMaybe(s.partDiameter)} × ${formatMaybe(s.partHeight)} мм`;
+    els.infoLayout.textContent = `${formatMaybe(s.x)} × ${formatMaybe(s.y)} × ${formatMaybe(s.z)}`;
+    els.infoPerLayer.textContent = s.x !== null && s.y !== null ? `${intFmt.format(s.x * s.y)} шт` : '—';
+    els.infoLayers.textContent = s.z === null ? '—' : String(s.z);
+    els.infoTotal.textContent = '—';
+    els.topCaption.textContent = 'Заполните размеры ящика, детали и укладку';
+    els.sideCaption.textContent = 'Проекция появится после заполнения полей';
+    els.endCaption.textContent = 'Проекция появится после заполнения полей';
+    els.heroCrateName.textContent = selectedCrate() ? `Ящик ${crateName()}` : 'Новый расчёт';
+    els.heroCrateSize.textContent = hasBox(s) ? `${fmt.format(s.boxLength)} × ${fmt.format(s.boxWidth)} × ${fmt.format(s.boxHeight)} мм` : 'Выберите ящик или задайте свой размер';
+    setStatusNeutral();
+    drawEmptyProjection(els.topProjection, 'Заполните параметры для вида сверху');
+    drawEmptyProjection(els.sideProjection, 'Заполните параметры для вида сбоку');
+    drawEmptyProjection(els.endProjection, 'Заполните параметры для вида с торца');
+    renderPresets(s);
+  }
+
   function update() {
     const s = getState();
+    if (!isComplete(s)) {
+      renderIncomplete(s);
+      return;
+    }
+
     const perLayer = s.x * s.y;
     const total = perLayer * s.z;
     const g = gaps(s);
@@ -348,16 +415,45 @@
     renderPresets(s);
   }
 
+  function firstMissingForMax(s) {
+    if (s.boxLength === null) return els.boxLength;
+    if (s.boxWidth === null) return els.boxWidth;
+    if (s.boxHeight === null) return els.boxHeight;
+    if (s.partDiameter === null) return els.partDiameter;
+    if (s.partHeight === null) return els.partHeight;
+    return null;
+  }
+
   function maxFit() {
     const s = getState();
+    const missing = firstMissingForMax(s);
+    if (missing) {
+      missing.focus();
+      const original = els.maxFitButton.textContent;
+      els.maxFitButton.textContent = 'Заполните размеры';
+      window.setTimeout(() => { els.maxFitButton.textContent = original; }, 1400);
+      return;
+    }
     els.countX.value = Math.max(1, Math.min(MAX_COUNT, Math.floor(s.boxLength / s.partDiameter)));
     els.countY.value = Math.max(1, Math.min(MAX_COUNT, Math.floor(s.boxWidth / s.partDiameter)));
     els.countZ.value = Math.max(1, Math.min(MAX_COUNT, Math.floor(s.boxHeight / s.partHeight)));
     update();
   }
 
+  function temporaryButtonLabel(button, text, restore, delay = 1800) {
+    const label = button.querySelector('b') || button;
+    clearTimeout(copyTimer);
+    label.textContent = text;
+    copyTimer = window.setTimeout(() => { label.textContent = restore; }, delay);
+  }
+
   async function copySummary() {
-    const text = summaryText(getState());
+    const s = getState();
+    if (!isComplete(s)) {
+      temporaryButtonLabel(els.copyButton, 'Заполните поля', 'Скопировать');
+      return;
+    }
+    const text = summaryText(s);
     let copied = false;
     try {
       if (navigator.clipboard?.writeText && window.isSecureContext) {
@@ -416,6 +512,16 @@
 
   function saveCurrentPreset() {
     const s = getState();
+    if (!hasPart(s) || !hasLayout(s)) {
+      const original = els.savePreset.querySelector('b')?.textContent || 'Сохранить вариант';
+      const label = els.savePreset.querySelector('b');
+      if (label) {
+        label.textContent = 'Заполните деталь и укладку';
+        window.setTimeout(() => { label.textContent = original; }, 1600);
+      }
+      (s.partDiameter === null ? els.partDiameter : s.partHeight === null ? els.partHeight : s.x === null ? els.countX : s.y === null ? els.countY : els.countZ).focus();
+      return;
+    }
     const list = loadPresets();
     const exists = list.some(p => Number(p.diameter) === s.partDiameter && Number(p.height) === s.partHeight && Number(p.x) === s.x && Number(p.y) === s.y && Number(p.z) === s.z);
     if (!exists) list.push({ id: `p-${Date.now()}`, diameter: s.partDiameter, height: s.partHeight, x: s.x, y: s.y, z: s.z });
@@ -448,37 +554,48 @@
     setTheme(saved);
   }
 
-  function reset() {
-    applyState(DEFAULTS);
-    els.cratePreset.value = DEFAULTS.crateId;
+  function newCalculation() {
+    els.cratePreset.value = 'custom';
+    numericInputs.forEach(input => { input.value = ''; });
+    const copyLabel = els.copyButton.querySelector('b');
+    if (copyLabel) copyLabel.textContent = 'Скопировать';
+    els.copyButton.classList.remove('is-copied');
     update();
+    els.cratePreset.focus();
   }
 
-  function normalizeInputs() {
-    const s = getState();
-    els.boxLength.value = s.boxLength; els.boxWidth.value = s.boxWidth; els.boxHeight.value = s.boxHeight;
-    els.partDiameter.value = s.partDiameter; els.partHeight.value = s.partHeight;
-    els.countX.value = s.x; els.countY.value = s.y; els.countZ.value = s.z;
-    update();
+  function normalizeInput(input, integer = false) {
+    if (!String(input.value).trim()) return;
+    const value = integer ? countOrNull(input.value) : numberOrNull(input.value, input === els.partDiameter || input === els.partHeight ? 3000 : 5000);
+    input.value = value ?? '';
   }
 
   function bindEvents() {
+    els.resetButton.textContent = '＋ Новый расчёт';
+    els.resetButton.title = 'Очистить все поля и начать новый расчёт';
     els.cratePreset.addEventListener('change', onCrateChange);
     [els.boxLength, els.boxWidth, els.boxHeight].forEach(input => {
       input.addEventListener('input', () => { matchCrateFromDimensions(); update(); });
-      input.addEventListener('change', normalizeInputs);
+      input.addEventListener('change', () => { normalizeInput(input); matchCrateFromDimensions(); update(); });
     });
-    [els.partDiameter, els.partHeight, els.countX, els.countY, els.countZ].forEach(input => {
-      input.addEventListener('input', update); input.addEventListener('change', normalizeInputs);
+    [els.partDiameter, els.partHeight].forEach(input => {
+      input.addEventListener('input', update);
+      input.addEventListener('change', () => { normalizeInput(input); update(); });
+    });
+    [els.countX, els.countY, els.countZ].forEach(input => {
+      input.addEventListener('input', update);
+      input.addEventListener('change', () => { normalizeInput(input, true); update(); });
     });
     document.querySelectorAll('[data-step-target]').forEach(button => {
       button.addEventListener('click', () => {
         const input = $(button.dataset.stepTarget); if (!input) return;
-        input.value = Math.max(1, Math.min(MAX_COUNT, int(input.value) + Number(button.dataset.step || 0)));
+        const current = countOrNull(input.value) ?? 0;
+        const delta = Number(button.dataset.step || 0);
+        input.value = Math.max(1, Math.min(MAX_COUNT, current + delta));
         update();
       });
     });
-    els.resetButton.addEventListener('click', reset);
+    els.resetButton.addEventListener('click', newCalculation);
     els.maxFitButton.addEventListener('click', maxFit);
     els.copyButton.addEventListener('click', copySummary);
     els.savePreset.addEventListener('click', saveCurrentPreset);
