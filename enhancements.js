@@ -4,6 +4,7 @@
   const LAST_KEY = 'box-pwa-last-v1';
   const MODE_KEY = 'box-pwa-pack-mode-v1';
   const MAX_COUNT = 999;
+  const MAX_TOP_VISIBLE = 900;
   const SQRT3_OVER_2 = Math.sqrt(3) / 2;
   const $ = id => document.getElementById(id);
 
@@ -176,18 +177,21 @@
     const y0 = 86 + (maxH - h) / 2;
     let circles = '';
 
-    for (let y = 0; y < s.y; y++) {
+    const total = s.x * s.y;
+    let drawn = 0;
+    outer: for (let y = 0; y < s.y; y++) {
       const offset = y % 2 ? d / 2 : 0;
       const cy = y0 + d / 2 + y * rowPitch;
       for (let x = 0; x < s.x; x++) {
+        if (drawn >= MAX_TOP_VISIBLE) break outer;
         const cx = x0 + d / 2 + offset + x * d;
         circles += `<g filter="url(#enh-shadow)"><circle cx="${cx}" cy="${cy}" r="${Math.max(.2, d / 2 - Math.min(1.1, d * .04))}" fill="url(#enh-top)" stroke="#68757d" stroke-width="${Math.max(.25, Math.min(.9, d * .022))}"/>`;
         if (d > 12) circles += `<ellipse cx="${cx - d * .12}" cy="${cy - d * .14}" rx="${d * .11}" ry="${d * .07}" fill="#fff" fill-opacity=".5"/>`;
         circles += '</g>';
+        drawn++;
       }
     }
 
-    const total = s.x * s.y;
     els.topProjection.innerHTML = `
       <svg viewBox="0 0 ${viewW} ${viewH}" preserveAspectRatio="xMidYMid meet" aria-label="Шахматная укладка, вид сверху">
         ${metalDefs()}
@@ -201,7 +205,7 @@
         <text x="${x0+w/2}" y="37" text-anchor="middle" class="dim-text">${fmt.format(dims.length)} мм</text>
         <line x1="55" y1="${y0}" x2="55" y2="${y0+h}" stroke="#3b6076" stroke-width="1.4"/>
         <text x="40" y="${y0+h/2}" text-anchor="middle" class="dim-text" transform="rotate(-90 40 ${y0+h/2})">${fmt.format(dims.width)} мм</text>
-        <text x="320" y="286" text-anchor="middle" class="dim-note">шахматная · ${s.x} × ${s.y} = ${intFmt.format(total)} шт. в одном слое</text>
+        <text x="320" y="286" text-anchor="middle" class="dim-note">${total > MAX_TOP_VISIBLE ? `шахматная · показана часть · в слое ${intFmt.format(total)} шт.` : `шахматная · ${s.x} × ${s.y} = ${intFmt.format(total)} шт. в одном слое`}</text>
       </svg>`;
   }
 
