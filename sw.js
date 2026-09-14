@@ -1,10 +1,12 @@
-const VERSION = '3.2.0';
+const VERSION = '3.3.0';
 const CACHE = `box-pwa-v${VERSION}`;
 const APP_SHELL = [
   './',
   './index.html',
   `./styles.css?v=${VERSION}`,
+  `./enhancements.css?v=${VERSION}`,
   `./app.js?v=${VERSION}`,
+  `./enhancements.js?v=${VERSION}`,
   `./manifest.webmanifest?v=${VERSION}`,
   './icon.svg',
   './.nojekyll'
