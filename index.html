@@ -7,11 +7,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Box" />
-  <meta name="description" content="Offline-first калькулятор укладки деталей в пластиковый ящик HP280." />
+  <meta name="description" content="Offline-first калькулятор укладки деталей в пластиковые ящики." />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="./icon.svg" />
-  <link rel="stylesheet" href="./styles.css?v=2" />
+  <link rel="stylesheet" href="./styles.css" />
   <title>Box — калькулятор укладки</title>
 </head>
 <body>
@@ -19,27 +19,8 @@
     <header class="topbar">
       <div class="title-block">
         <h1>Калькулятор укладки в ящик</h1>
-        <p class="subtitle">Рассчитайте, сколько деталей поместится в ящик. Визуализация укладки в реальном размере.</p>
+        <p class="subtitle">Выберите ящик, укажите деталь и количество по осям — раскладка обновится сразу.</p>
       </div>
-
-      <a class="hero-card" href="https://epicentrk.ua/shop/mplc-asik-plastikovij-hp280-sucil-nij-z-ruckami-600h400h280-mm-hp280-1efd8aba-43d4-6068-a9b3-6306ffb3fdd5.html" target="_blank" rel="noreferrer noopener" aria-label="Открыть карточку ящика HP280 в Epicentr">
-        <div class="hero-crate" aria-hidden="true">
-          <div class="hero-crate-face"></div>
-          <div class="hero-crate-side"></div>
-          <div class="hero-crate-top"></div>
-          <div class="hero-crate-rib r1"></div>
-          <div class="hero-crate-rib r2"></div>
-          <div class="hero-crate-rib r3"></div>
-          <div class="hero-crate-handle left"></div>
-          <div class="hero-crate-handle right"></div>
-        </div>
-        <div class="hero-card-text">
-          <strong>Ящик HP280</strong>
-          <span>600 × 400 × 280 мм</span>
-          <small>Сплошной, с ручками</small>
-          <em>epicentrk.ua →</em>
-        </div>
-      </a>
     </header>
 
     <main class="workspace">
@@ -48,19 +29,18 @@
           <div class="section-head">
             <div class="section-head-main">
               <span class="step">1</span>
-              <div><h2>Параметры ящика</h2></div>
+              <h2>Параметры ящика</h2>
             </div>
             <button id="resetButton" class="reset-button" type="button">↻ Сбросить</button>
           </div>
 
-          <button class="crate-select" type="button" aria-label="Выбран ящик HP280">
-            <div class="crate-select-icon" aria-hidden="true"><span></span><span></span><span></span></div>
-            <div class="crate-select-text">
-              <strong>Ящик HP280</strong>
-              <span>600 × 400 × 280 мм</span>
+          <label class="crate-picker" for="cratePreset">
+            <div class="crate-picker-icon" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="crate-picker-main">
+              <span class="crate-picker-label">Выберите ящик</span>
+              <select id="cratePreset" aria-label="Выбор ящика"></select>
             </div>
-            <span class="crate-select-arrow">⌄</span>
-          </button>
+          </label>
 
           <div class="field-list compact">
             <label class="field-row">
@@ -80,7 +60,7 @@
 
         <section class="panel section-panel">
           <div class="section-head">
-            <div class="section-head-main"><span class="step">2</span><div><h2>Параметры детали</h2></div></div>
+            <div class="section-head-main"><span class="step">2</span><h2>Параметры детали</h2></div>
           </div>
 
           <div class="shape-group">
@@ -102,44 +82,23 @@
               </div>
             </div>
             <div class="field-list compact detail-fields">
-              <label class="field-row">
-                <span>Ø Диаметр</span>
-                <div class="input-unit"><input id="partDiameter" type="number" min="1" step="1" value="50" inputmode="decimal" /><small>мм</small></div>
-              </label>
-              <label class="field-row">
-                <span>Высота</span>
-                <div class="input-unit"><input id="partHeight" type="number" min="1" step="1" value="20" inputmode="decimal" /><small>мм</small></div>
-              </label>
+              <label class="field-row"><span>Ø Диаметр</span><div class="input-unit"><input id="partDiameter" type="number" min="1" step="1" value="50" inputmode="decimal" /><small>мм</small></div></label>
+              <label class="field-row"><span>Высота</span><div class="input-unit"><input id="partHeight" type="number" min="1" step="1" value="20" inputmode="decimal" /><small>мм</small></div></label>
             </div>
           </div>
         </section>
 
         <section class="panel section-panel">
-          <div class="section-head">
-            <div class="section-head-main"><span class="step">3</span><div><h2>Укладка</h2></div></div>
-          </div>
-
+          <div class="section-head"><div class="section-head-main"><span class="step">3</span><h2>Укладка</h2></div></div>
           <div class="count-row-grid">
-            <label class="count-card">
-              <span>В длину (X)</span>
-              <div class="count-control"><button type="button" data-step-target="countX" data-step="-1">−</button><input id="countX" type="number" min="1" max="999" step="1" value="9" inputmode="numeric" /><button type="button" data-step-target="countX" data-step="1">+</button></div>
-              <small>шт</small>
-            </label>
-            <label class="count-card">
-              <span>В ширину (Y)</span>
-              <div class="count-control"><button type="button" data-step-target="countY" data-step="-1">−</button><input id="countY" type="number" min="1" max="999" step="1" value="5" inputmode="numeric" /><button type="button" data-step-target="countY" data-step="1">+</button></div>
-              <small>шт</small>
-            </label>
-            <label class="count-card">
-              <span>Рядов в высоту (Z)</span>
-              <div class="count-control"><button type="button" data-step-target="countZ" data-step="-1">−</button><input id="countZ" type="number" min="1" max="999" step="1" value="4" inputmode="numeric" /><button type="button" data-step-target="countZ" data-step="1">+</button></div>
-              <small>шт</small>
-            </label>
+            <label class="count-card"><span>В длину (X)</span><div class="count-control"><button type="button" data-step-target="countX" data-step="-1">−</button><input id="countX" type="number" min="1" max="999" step="1" value="9" inputmode="numeric" /><button type="button" data-step-target="countX" data-step="1">+</button></div><small>шт</small></label>
+            <label class="count-card"><span>В ширину (Y)</span><div class="count-control"><button type="button" data-step-target="countY" data-step="-1">−</button><input id="countY" type="number" min="1" max="999" step="1" value="5" inputmode="numeric" /><button type="button" data-step-target="countY" data-step="1">+</button></div><small>шт</small></label>
+            <label class="count-card"><span>Рядов в высоту (Z)</span><div class="count-control"><button type="button" data-step-target="countZ" data-step="-1">−</button><input id="countZ" type="number" min="1" max="999" step="1" value="4" inputmode="numeric" /><button type="button" data-step-target="countZ" data-step="1">+</button></div><small>шт</small></label>
           </div>
         </section>
 
         <section class="panel result-panel" aria-live="polite">
-          <div class="section-head"><div class="section-head-main"><span class="step">4</span><div><h2>Результат</h2></div></div></div>
+          <div class="section-head"><div class="section-head-main"><span class="step">4</span><h2>Результат</h2></div></div>
           <div class="result-box">
             <div class="result-icon" aria-hidden="true"><span></span><span></span><span></span></div>
             <div class="result-text"><span>Всего в ящике:</span><strong><span id="totalCount">180</span> шт</strong><small id="resultFormula">(9 × 5 × 4)</small></div>
@@ -164,7 +123,7 @@
 
           <div class="visual-grid">
             <article class="projection-card projection-top-card">
-              <div class="projection-header"><div><h3>Вид сверху <span>(длина × ширина)</span></h3></div></div>
+              <div class="projection-header"><h3>Вид сверху <span>(длина × ширина)</span></h3></div>
               <div id="topProjection" class="projection-stage top-stage" role="img" aria-label="Вид сверху"></div>
               <p id="topCaption" class="projection-caption">9 шт в длину × 5 шт в ширину (45 шт в слое)</p>
             </article>
@@ -173,7 +132,7 @@
               <section class="info-card neutral-card">
                 <h3>Информация</h3>
                 <dl class="info-list">
-                  <div><dt>Ящик:</dt><dd>HP280</dd></div>
+                  <div><dt>Ящик:</dt><dd id="infoBoxName">HP280</dd></div>
                   <div><dt>Внутр. размеры:</dt><dd id="infoBoxSize">600 × 400 × 280 мм</dd></div>
                   <div><dt>Деталь:</dt><dd id="infoPartSize">Ø50 × 20 мм</dd></div>
                   <div><dt>Укладка:</dt><dd id="infoLayout">9 × 5 × 4</dd></div>
@@ -212,34 +171,20 @@
           <div class="presets-header"><div><h2>Быстрые варианты</h2><p>Сохраните частые конфигурации</p></div></div>
           <div id="quickPresets" class="quick-presets"></div>
           <div class="preset-create-card">
-            <div>
-              <label class="field-row full-width">
-                <span>Название варианта</span>
-                <div class="input-unit wide-input"><input id="presetName" type="text" maxlength="32" value="50 × 20" autocomplete="off" /></div>
-              </label>
-            </div>
+            <label class="field-row full-width"><span>Название варианта</span><div class="input-unit wide-input"><input id="presetName" type="text" maxlength="32" value="50 × 20" autocomplete="off" /></div></label>
             <button id="savePreset" class="save-preset-button" type="button">＋ Сохранить вариант</button>
           </div>
         </section>
       </section>
     </main>
 
-    <footer class="footer-bar">
-      <span>Box PWA</span>
-      <span id="offlineState">Готов к офлайн-работе</span>
-      <button id="installButton" class="install-button is-hidden" type="button">Установить</button>
-    </footer>
+    <footer class="footer-bar"><span>Box PWA</span><span id="offlineState">Готов к офлайн-работе</span><button id="installButton" class="install-button is-hidden" type="button">Установить</button></footer>
   </div>
 
   <template id="quickPresetTemplate">
-    <button class="quick-card" type="button">
-      <strong class="quick-card-title"></strong>
-      <span class="quick-card-layout"></span>
-      <b class="quick-card-total"></b>
-      <span class="quick-card-delete" role="button" tabindex="0" aria-label="Удалить вариант">×</span>
-    </button>
+    <button class="quick-card" type="button"><strong class="quick-card-title"></strong><span class="quick-card-layout"></span><b class="quick-card-total"></b><span class="quick-card-delete" role="button" tabindex="0" aria-label="Удалить вариант">×</span></button>
   </template>
 
-  <script src="./app.js?v=2" defer></script>
+  <script src="./app.js" defer></script>
 </body>
 </html>
