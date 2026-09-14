@@ -1,12 +1,12 @@
 {
   "name": "Box — калькулятор укладки",
   "short_name": "Box",
-  "description": "Offline-first калькулятор количества деталей в пластиковом ящике с тремя синхронными проекциями.",
+  "description": "Offline-first калькулятор количества деталей и габаритов укладки без привязки к таре.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#edf3f8",
-  "theme_color": "#0d7a4f",
+  "background_color": "#f2f6f5",
+  "theme_color": "#16934f",
   "lang": "ru",
   "orientation": "any",
   "icons": [
