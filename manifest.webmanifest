@@ -1,0 +1,20 @@
+{
+  "name": "Box — калькулятор укладки",
+  "short_name": "Box",
+  "description": "Offline-first калькулятор количества деталей в пластиковом ящике с тремя синхронными проекциями.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#edf3f8",
+  "theme_color": "#0d7a4f",
+  "lang": "ru",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
