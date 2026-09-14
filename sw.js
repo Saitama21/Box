@@ -1,4 +1,4 @@
-const VERSION = '3.0.1';
+const VERSION = '3.1.0';
 const CACHE = `box-pwa-v${VERSION}`;
 const APP_SHELL = [
   './',
@@ -47,8 +47,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Network-first prevents a new HTML shell from being paired with stale CSS/JS
-  // after a deployment. Cached assets remain available when the device is offline.
   event.respondWith(
     fetch(event.request)
       .then(response => {
