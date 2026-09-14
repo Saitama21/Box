@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d7a4f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Box" />
+  <meta name="description" content="Offline-first калькулятор укладки деталей в пластиковый ящик." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>Box — калькулятор укладки</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">BOX / PACKING CALCULATOR</p>
+        <h1>Калькулятор укладки в ящик</h1>
+        <p class="subtitle">Укажи, сколько деталей помещается в длину, ширину и по высоте — раскладка перерисуется автоматически.</p>
+      </div>
+      <div class="topbar-actions">
+        <button id="themeToggle" class="icon-button" type="button" aria-label="Переключить тему" title="Переключить тему">◐</button>
+        <button id="installButton" class="ghost-button is-hidden" type="button">Установить PWA</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="control-column">
+        <section class="panel crate-card">
+          <div class="section-title-row">
+            <span class="step">1</span>
+            <div>
+              <h2>Ящик</h2>
+              <p>Промышленный пластиковый crate</p>
+            </div>
+          </div>
+          <div class="crate-summary">
+            <div class="crate-mini" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <div>
+              <strong>HP280</strong>
+              <span>600 × 400 × 280 мм</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-title-row">
+            <span class="step">2</span>
+            <div>
+              <h2>Укладка</h2>
+              <p>Только реальные количества</p>
+            </div>
+          </div>
+
+          <label class="field">
+            <span>Название варианта</span>
+            <input id="presetName" type="text" inputmode="text" maxlength="32" value="Ящик A" autocomplete="off" />
+          </label>
+
+          <div class="count-grid">
+            <label class="field count-field">
+              <span>В длину <small>X</small></span>
+              <div class="number-control">
+                <button type="button" data-step-target="lengthCount" data-step="-1" aria-label="Уменьшить">−</button>
+                <input id="lengthCount" type="number" min="1" max="99" step="1" value="9" inputmode="numeric" />
+                <button type="button" data-step-target="lengthCount" data-step="1" aria-label="Увеличить">+</button>
+              </div>
+            </label>
+
+            <label class="field count-field">
+              <span>В ширину <small>Y</small></span>
+              <div class="number-control">
+                <button type="button" data-step-target="widthCount" data-step="-1" aria-label="Уменьшить">−</button>
+                <input id="widthCount" type="number" min="1" max="99" step="1" value="5" inputmode="numeric" />
+                <button type="button" data-step-target="widthCount" data-step="1" aria-label="Увеличить">+</button>
+              </div>
+            </label>
+
+            <label class="field count-field full">
+              <span>Рядов по высоте <small>Z</small></span>
+              <div class="number-control">
+                <button type="button" data-step-target="heightCount" data-step="-1" aria-label="Уменьшить">−</button>
+                <input id="heightCount" type="number" min="1" max="99" step="1" value="4" inputmode="numeric" />
+                <button type="button" data-step-target="heightCount" data-step="1" aria-label="Увеличить">+</button>
+              </div>
+            </label>
+          </div>
+
+          <button id="savePreset" class="primary-button" type="button">Сохранить вариант</button>
+        </section>
+
+        <section class="panel result-panel" aria-live="polite">
+          <div class="section-title-row compact">
+            <span class="step">3</span>
+            <h2>Результат</h2>
+          </div>
+          <div class="result-main">
+            <span>Всего в ящике</span>
+            <strong><span id="totalCount">180</span> <small>шт</small></strong>
+            <code id="formula">9 × 5 × 4</code>
+          </div>
+          <div class="result-stats">
+            <div><span>В одном слое</span><strong id="layerCount">45 шт</strong></div>
+            <div><span>Слоёв</span><strong id="layersCount">4</strong></div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="visual-column">
+        <div class="panel visual-panel">
+          <div class="visual-header">
+            <div>
+              <p class="eyebrow">ЖИВАЯ ВИЗУАЛИЗАЦИЯ</p>
+              <h2>Прозрачный ящик</h2>
+            </div>
+            <div class="status-pill"><span></span> синхронно</div>
+          </div>
+
+          <div class="views-grid">
+            <article class="projection projection-top">
+              <div class="projection-heading">
+                <div><strong>Вид сверху</strong><span>длина × ширина</span></div>
+                <b id="topLabel">9 × 5</b>
+              </div>
+              <div id="topProjection" class="projection-stage" role="img" aria-label="Вид сверху"></div>
+              <p id="topCaption">45 деталей в одном слое</p>
+            </article>
+
+            <article class="projection">
+              <div class="projection-heading">
+                <div><strong>Вид сбоку</strong><span>длина × высота</span></div>
+                <b id="sideLabel">9 × 4</b>
+              </div>
+              <div id="sideProjection" class="projection-stage side-stage" role="img" aria-label="Вид сбоку по длине"></div>
+              <p id="sideCaption">9 в длину × 4 слоя</p>
+            </article>
+
+            <article class="projection">
+              <div class="projection-heading">
+                <div><strong>Вид с торца</strong><span>ширина × высота</span></div>
+                <b id="endLabel">5 × 4</b>
+              </div>
+              <div id="endProjection" class="projection-stage side-stage" role="img" aria-label="Вид с торца по ширине"></div>
+              <p id="endCaption">5 в ширину × 4 слоя</p>
+            </article>
+          </div>
+        </div>
+
+        <section class="panel presets-panel">
+          <div class="presets-head">
+            <div>
+              <h2>Сохранённые варианты</h2>
+              <p>Хранятся локально на устройстве и доступны офлайн.</p>
+            </div>
+            <button id="clearPresets" class="text-button" type="button">Очистить</button>
+          </div>
+          <div id="presetList" class="preset-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <footer>
+      <span>Box PWA</span>
+      <span id="offlineState">Готов к офлайн-работе</span>
+    </footer>
+  </div>
+
+  <template id="presetTemplate">
+    <button class="preset-card" type="button">
+      <span class="preset-name"></span>
+      <strong class="preset-total"></strong>
+      <small class="preset-formula"></small>
+      <span class="preset-delete" role="button" tabindex="0" aria-label="Удалить вариант">×</span>
+    </button>
+  </template>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
