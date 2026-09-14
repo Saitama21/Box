@@ -25,6 +25,7 @@
   let copyTimer = 0;
   let saveTimer = 0;
   let proxyRestoreQueued = false;
+  let proxyingZ = false;
 
   function num(input) {
     const n = Number(String(input.value || '').replace(',', '.'));
@@ -126,14 +127,16 @@
     const watched = new Set([els.d, els.h, els.x, els.y, els.z]);
     const proxy = event => {
       if (!watched.has(event.target)) return;
-      if (event.target === els.z) zOptional = String(els.z.value || '').trim() === '';
+      if (event.target === els.z && !proxyingZ) zOptional = String(els.z.value || '').trim() === '';
       if (!zOptional) return;
 
       els.z.value = '1';
+      proxyingZ = true;
       if (proxyRestoreQueued) return;
       proxyRestoreQueued = true;
       queueMicrotask(() => {
         proxyRestoreQueued = false;
+        proxyingZ = false;
         if (zOptional) els.z.value = '';
         scheduleRefresh();
       });
