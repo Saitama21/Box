@@ -4,13 +4,13 @@
   const LAST_KEY = 'box-pwa-last-v1';
   const MODE_KEY = 'box-pwa-pack-mode-v1';
   const MAX_COUNT = 999;
-  const MAX_TOP_VISIBLE = 900;
   const SQRT3_OVER_2 = Math.sqrt(3) / 2;
   const $ = id => document.getElementById(id);
 
   const els = {
     d: $('partDiameter'), h: $('partHeight'), x: $('countX'), y: $('countY'), z: $('countZ'),
-    newButton: $('newButton'), copyButton: $('copyButton'),
+    calculateButton: $('calculateButton'), newButton: $('newButton'), copyButton: $('copyButton'),
+    totalCount: $('totalCount'), miniTotal: $('miniTotal'),
     topSize: $('topSize'), sideSize: $('sideSize'), endSize: $('endSize'), previewLabel: $('previewLabel'),
     topProjection: $('topProjection'), sideProjection: $('sideProjection'), endProjection: $('endProjection'), isoProjection: $('isoProjection'),
     resultLayout: $('resultLayout'), resultBlock: $('resultBlock'), miniFormula: $('miniFormula')
@@ -21,8 +21,10 @@
   const fmt = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
   const intFmt = new Intl.NumberFormat('ru-RU');
   let mode = readMode();
+  let zOptional = String(els.z.value || '').trim() === '';
   let copyTimer = 0;
   let saveTimer = 0;
+  let proxyRestoreQueued = false;
 
   function num(input) {
     const n = Number(String(input.value || '').replace(',', '.'));
@@ -30,16 +32,39 @@
   }
 
   function integer(input) {
-    const n = Math.trunc(Number(input.value));
+    const raw = String(input.value || '').trim();
+    if (!raw) return null;
+    const n = Math.trunc(Number(raw));
     return Number.isFinite(n) && n >= 1 ? Math.min(MAX_COUNT, n) : null;
   }
 
   function state() {
-    return { d: num(els.d), h: num(els.h), x: integer(els.x), y: integer(els.y), z: integer(els.z) };
+    return {
+      d: num(els.d),
+      h: num(els.h),
+      x: integer(els.x),
+      y: integer(els.y),
+      z: zOptional ? null : integer(els.z)
+    };
+  }
+
+  function layers(s) {
+    return s.z ?? 1;
   }
 
   function complete(s) {
-    return s.d !== null && s.h !== null && s.x !== null && s.y !== null && s.z !== null;
+    return s.d !== null && s.h !== null && s.x !== null && s.y !== null;
+  }
+
+  function layoutText(s) {
+    return s.z === null ? `${s.x} × ${s.y}` : `${s.x} × ${s.y} × ${s.z}`;
+  }
+
+  function layerLabel(s) {
+    const z = layers(s);
+    if (z === 1) return '1 слой';
+    if (z >= 2 && z <= 4) return `${z} слоя`;
+    return `${z} слоёв`;
   }
 
   function dimensions(s) {
@@ -47,7 +72,7 @@
     return {
       length: s.x * s.d + (staggered ? s.d / 2 : 0),
       width: staggered ? s.d + (s.y - 1) * s.d * SQRT3_OVER_2 : s.y * s.d,
-      height: s.z * s.h
+      height: layers(s) * s.h
     };
   }
 
@@ -63,10 +88,24 @@
   function restoreLast() {
     try {
       const saved = JSON.parse(localStorage.getItem(LAST_KEY) || 'null');
-      if (!saved) return;
-      const pairs = [[els.d, saved.d], [els.h, saved.h], [els.x, saved.x], [els.y, saved.y], [els.z, saved.z]];
-      for (const [input, value] of pairs) if (value !== undefined && value !== null && value !== '') input.value = value;
-    } catch (_) {}
+      if (!saved) {
+        zOptional = String(els.z.value || '').trim() === '';
+        return;
+      }
+      const pairs = [[els.d, saved.d], [els.h, saved.h], [els.x, saved.x], [els.y, saved.y]];
+      for (const [input, value] of pairs) {
+        if (value !== undefined && value !== null && value !== '') input.value = value;
+      }
+      if (saved.z !== undefined && saved.z !== null && saved.z !== '') {
+        els.z.value = saved.z;
+        zOptional = false;
+      } else {
+        els.z.value = '';
+        zOptional = true;
+      }
+    } catch (_) {
+      zOptional = String(els.z.value || '').trim() === '';
+    }
   }
 
   function saveLast() {
@@ -81,6 +120,26 @@
   function clearLast() {
     clearTimeout(saveTimer);
     try { localStorage.removeItem(LAST_KEY); } catch (_) {}
+  }
+
+  function installOptionalZProxy() {
+    const watched = new Set([els.d, els.h, els.x, els.y, els.z]);
+    const proxy = event => {
+      if (!watched.has(event.target)) return;
+      if (event.target === els.z) zOptional = String(els.z.value || '').trim() === '';
+      if (!zOptional) return;
+
+      els.z.value = '1';
+      if (proxyRestoreQueued) return;
+      proxyRestoreQueued = true;
+      queueMicrotask(() => {
+        proxyRestoreQueued = false;
+        if (zOptional) els.z.value = '';
+        scheduleRefresh();
+      });
+    };
+    document.addEventListener('input', proxy, true);
+    document.addEventListener('change', proxy, true);
   }
 
   function createStepper(input) {
@@ -104,9 +163,18 @@
     wrap.append(minus, input, plus);
 
     const bump = delta => {
-      const current = integer(input);
-      const next = Math.max(1, Math.min(MAX_COUNT, (current ?? (delta > 0 ? 0 : 1)) + delta));
-      input.value = next;
+      const isZ = input === els.z;
+      const current = isZ && zOptional ? 1 : (integer(input) ?? 1);
+      const next = Math.max(1, Math.min(MAX_COUNT, current + delta));
+
+      if (isZ && next === 1) {
+        zOptional = true;
+        input.value = '';
+      } else {
+        if (isZ) zOptional = false;
+        input.value = next;
+      }
+
       input.dispatchEvent(new Event('input', { bubbles: true }));
       input.dispatchEvent(new Event('change', { bubbles: true }));
       input.focus({ preventScroll: true });
@@ -135,8 +203,7 @@
         mode = button.dataset.pack === 'staggered' ? 'staggered' : 'straight';
         saveMode();
         updatePackingButtons();
-        els.x.dispatchEvent(new Event('input', { bubbles: true }));
-        scheduleRefresh();
+        triggerCoreRender();
       });
     });
   }
@@ -175,15 +242,15 @@
     const h = dims.width * scale;
     const x0 = 95 + (maxW - w) / 2;
     const y0 = 86 + (maxH - h) / 2;
+    const maxVisible = 1200;
+    let drawn = 0;
     let circles = '';
 
-    const total = s.x * s.y;
-    let drawn = 0;
     outer: for (let y = 0; y < s.y; y++) {
       const offset = y % 2 ? d / 2 : 0;
       const cy = y0 + d / 2 + y * rowPitch;
       for (let x = 0; x < s.x; x++) {
-        if (drawn >= MAX_TOP_VISIBLE) break outer;
+        if (drawn >= maxVisible) break outer;
         const cx = x0 + d / 2 + offset + x * d;
         circles += `<g filter="url(#enh-shadow)"><circle cx="${cx}" cy="${cy}" r="${Math.max(.2, d / 2 - Math.min(1.1, d * .04))}" fill="url(#enh-top)" stroke="#68757d" stroke-width="${Math.max(.25, Math.min(.9, d * .022))}"/>`;
         if (d > 12) circles += `<ellipse cx="${cx - d * .12}" cy="${cy - d * .14}" rx="${d * .11}" ry="${d * .07}" fill="#fff" fill-opacity=".5"/>`;
@@ -191,6 +258,11 @@
         drawn++;
       }
     }
+
+    const total = s.x * s.y;
+    const note = drawn < total
+      ? `шахматная · показано ${intFmt.format(drawn)} из ${intFmt.format(total)} шт. в слое`
+      : `шахматная · ${s.x} × ${s.y} = ${intFmt.format(total)} шт. в одном слое`;
 
     els.topProjection.innerHTML = `
       <svg viewBox="0 0 ${viewW} ${viewH}" preserveAspectRatio="xMidYMid meet" aria-label="Шахматная укладка, вид сверху">
@@ -205,34 +277,55 @@
         <text x="${x0+w/2}" y="37" text-anchor="middle" class="dim-text">${fmt.format(dims.length)} мм</text>
         <line x1="55" y1="${y0}" x2="55" y2="${y0+h}" stroke="#3b6076" stroke-width="1.4"/>
         <text x="40" y="${y0+h/2}" text-anchor="middle" class="dim-text" transform="rotate(-90 40 ${y0+h/2})">${fmt.format(dims.width)} мм</text>
-        <text x="320" y="286" text-anchor="middle" class="dim-note">${total > MAX_TOP_VISIBLE ? `шахматная · показана часть · в слое ${intFmt.format(total)} шт.` : `шахматная · ${s.x} × ${s.y} = ${intFmt.format(total)} шт. в одном слое`}</text>
+        <text x="320" y="286" text-anchor="middle" class="dim-note">${note}</text>
       </svg>`;
   }
 
   function patchProjectionNotes(s, dims) {
-    const sideDim = els.sideProjection.querySelector('text.dim-text');
-    const endDim = els.endProjection.querySelector('text.dim-text');
-    if (sideDim) sideDim.textContent = `${fmt.format(dims.length)} мм · габарит X`;
-    if (endDim) endDim.textContent = `${fmt.format(dims.width)} мм · габарит Y`;
+    const sideTexts = els.sideProjection.querySelectorAll('text.dim-text');
+    const endTexts = els.endProjection.querySelectorAll('text.dim-text');
+    if (sideTexts[0]) sideTexts[0].textContent = `${fmt.format(dims.length)} мм · габарит X`;
+    if (endTexts[0]) endTexts[0].textContent = `${fmt.format(dims.width)} мм · габарит Y`;
+    if (sideTexts[1]) sideTexts[1].textContent = `${fmt.format(dims.height)} мм · ${layerLabel(s)}`;
+    if (endTexts[1]) endTexts[1].textContent = `${fmt.format(dims.height)} мм · ${layerLabel(s)}`;
+
+    const sideTitle = els.sideProjection.closest('.projection-card')?.querySelector('h3 span');
+    const endTitle = els.endProjection.closest('.projection-card')?.querySelector('h3 span');
+    if (sideTitle) sideTitle.textContent = s.z === null ? '(X × 1 слой)' : '(X × Z)';
+    if (endTitle) endTitle.textContent = s.z === null ? '(Y × 1 слой)' : '(Y × Z)';
 
     const isoNote = els.isoProjection.querySelector('text.dim-note');
-    if (isoNote) isoNote.textContent = `${mode === 'staggered' ? 'шахматная' : 'ровная'} · ${s.x} × ${s.y} × ${s.z} · блок ${fmt.format(dims.length)} × ${fmt.format(dims.width)} × ${fmt.format(dims.height)} мм`;
+    if (isoNote) {
+      isoNote.textContent = `${mode === 'staggered' ? 'шахматная' : 'ровная'} · ${layoutText(s)} · ${layerLabel(s)} · блок ${fmt.format(dims.length)} × ${fmt.format(dims.width)} × ${fmt.format(dims.height)} мм`;
+    }
   }
 
   function refreshPacking() {
     const s = state();
     updatePackingButtons();
-    if (!complete(s)) return;
+
+    if (!complete(s)) {
+      if (els.calculateButton) els.calculateButton.disabled = true;
+      if (els.copyButton) els.copyButton.disabled = true;
+      return;
+    }
 
     const dims = dimensions(s);
-    const total = s.x * s.y * s.z;
+    const z = layers(s);
+    const total = s.x * s.y * z;
+
+    if (els.calculateButton) els.calculateButton.disabled = false;
+    if (els.copyButton) els.copyButton.disabled = false;
+    if (els.totalCount) els.totalCount.textContent = intFmt.format(total);
+    if (els.miniTotal) els.miniTotal.textContent = intFmt.format(total);
+
     els.topSize.textContent = `${fmt.format(dims.length)} × ${fmt.format(dims.width)} мм`;
     els.sideSize.textContent = `${fmt.format(dims.length)} × ${fmt.format(dims.height)} мм`;
     els.endSize.textContent = `${fmt.format(dims.width)} × ${fmt.format(dims.height)} мм`;
-    els.previewLabel.textContent = `${intFmt.format(total)} деталей · ${mode === 'staggered' ? 'шахматная' : 'ровная'}`;
-    els.resultLayout.textContent = `Укладка: ${s.x} × ${s.y} × ${s.z} · ${mode === 'staggered' ? 'шахматная' : 'ровная'} · в слое ${intFmt.format(s.x * s.y)} шт`;
+    els.previewLabel.textContent = `${intFmt.format(total)} деталей · ${layerLabel(s)}`;
+    els.resultLayout.textContent = `Укладка: ${layoutText(s)} · ${layerLabel(s)} · ${mode === 'staggered' ? 'шахматная' : 'ровная'} · в слое ${intFmt.format(s.x * s.y)} шт`;
     els.resultBlock.textContent = `Габариты блока: ${fmt.format(dims.length)} × ${fmt.format(dims.width)} × ${fmt.format(dims.height)} мм`;
-    els.miniFormula.textContent = `${s.x} × ${s.y} × ${s.z} · ${mode === 'staggered' ? 'шахм.' : 'ровно'}`;
+    els.miniFormula.textContent = `${layoutText(s)} · ${layerLabel(s)}`;
 
     if (mode === 'staggered') drawStaggeredTop(s);
     patchProjectionNotes(s, dims);
@@ -242,31 +335,50 @@
     requestAnimationFrame(() => requestAnimationFrame(refreshPacking));
   }
 
+  function triggerCoreRender() {
+    els.x.dispatchEvent(new Event('input', { bubbles: true }));
+    scheduleRefresh();
+  }
+
   async function copyCurrent() {
     const s = state();
     if (!complete(s)) return;
     const dims = dimensions(s);
-    const text = `Деталь Ø${fmt.format(s.d)}×${fmt.format(s.h)} мм | Укладка ${s.x}×${s.y}×${s.z} (${mode === 'staggered' ? 'шахматная' : 'ровная'}) | Всего ${intFmt.format(s.x*s.y*s.z)} шт | Габариты ${fmt.format(dims.length)}×${fmt.format(dims.width)}×${fmt.format(dims.height)} мм`;
+    const z = layers(s);
+    const layout = s.z === null ? `${s.x}×${s.y} (1 слой)` : `${s.x}×${s.y}×${s.z}`;
+    const text = `Деталь Ø${fmt.format(s.d)}×${fmt.format(s.h)} мм | Укладка ${layout} (${mode === 'staggered' ? 'шахматная' : 'ровная'}) | Всего ${intFmt.format(s.x * s.y * z)} шт | Габариты ${fmt.format(dims.length)}×${fmt.format(dims.width)}×${fmt.format(dims.height)} мм`;
     let copied = false;
     try {
-      if (navigator.clipboard?.writeText && window.isSecureContext) { await navigator.clipboard.writeText(text); copied = true; }
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        copied = true;
+      }
     } catch (_) {}
     if (!copied) {
       const area = document.createElement('textarea');
-      area.value = text; area.setAttribute('readonly',''); area.style.position='fixed'; area.style.opacity='0';
-      document.body.append(area); area.select();
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.append(area);
+      area.select();
       try { copied = document.execCommand('copy'); } catch (_) {}
       area.remove();
     }
     const label = els.copyButton?.querySelector('b');
     if (copied && label) {
       clearTimeout(copyTimer);
-      label.textContent = 'Скопировано ✓'; els.copyButton.classList.add('is-copied');
-      copyTimer = setTimeout(() => { label.textContent = 'Скопировать'; els.copyButton.classList.remove('is-copied'); }, 1800);
+      label.textContent = 'Скопировано ✓';
+      els.copyButton.classList.add('is-copied');
+      copyTimer = setTimeout(() => {
+        label.textContent = 'Скопировать';
+        els.copyButton.classList.remove('is-copied');
+      }, 1800);
     }
   }
 
   restoreLast();
+  installOptionalZProxy();
   createPackingSwitch();
   [els.x, els.y, els.z].forEach(createStepper);
   updatePackingButtons();
@@ -278,6 +390,8 @@
 
   els.newButton?.addEventListener('click', () => {
     clearLast();
+    zOptional = true;
+    els.z.value = '';
     mode = 'straight';
     saveMode();
     updatePackingButtons();
@@ -290,6 +404,5 @@
     copyCurrent();
   }, true);
 
-  els.x.dispatchEvent(new Event('input', { bubbles: true }));
-  scheduleRefresh();
+  triggerCoreRender();
 })();
