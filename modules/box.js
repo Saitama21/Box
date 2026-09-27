@@ -1,10 +1,11 @@
+import { computeBox, normalizeCount, layerLabel as coreLayerLabel, layoutText as coreLayoutText } from './box-core.mjs';
+
 (() => {
   'use strict';
 
   const LAST_KEY = 'cnc-suite.box.last-v1';
   const MODE_KEY = 'cnc-suite.box.mode-v1';
   const MAX_COUNT = 999;
-  const SQRT3_OVER_2 = Math.sqrt(3) / 2;
 
   const $ = id => document.getElementById(id);
   const el = {
@@ -24,33 +25,25 @@
 
   function readMode(){ try{return localStorage.getItem(MODE_KEY)==='staggered'?'staggered':'straight'}catch{return 'straight'} }
   function saveMode(){ try{localStorage.setItem(MODE_KEY,mode)}catch{} }
-  function number(input){
-    const n=Number(String(input.value||'').replace(',','.'));
-    return Number.isFinite(n)&&n>0?Math.min(3000,Math.round(n*100)/100):null;
+  function integer(input){ return normalizeCount(input.value, MAX_COUNT); }
+  function state(){
+    return computeBox({
+      d: el.d.value,
+      h: el.h.value,
+      x: el.x.value,
+      y: el.y.value,
+      z: zOptional ? null : el.z.value
+    }, mode);
   }
-  function integer(input){
-    const raw=String(input.value||'').trim();
-    if(!raw)return null;
-    const n=Math.trunc(Number(raw));
-    return Number.isFinite(n)&&n>=1?Math.min(MAX_COUNT,n):null;
-  }
-  function state(){return{d:number(el.d),h:number(el.h),x:integer(el.x),y:integer(el.y),z:zOptional?null:integer(el.z)}}
-  function layers(s){return s.z??1}
-  function complete(s){return s.d!==null&&s.h!==null&&s.x!==null&&s.y!==null}
-  function layerLabel(s){const z=layers(s);return z===1?'1 слой':z>=2&&z<=4?z+' слоя':z+' слоёв'}
-  function layoutText(s){return s.z===null?`${s.x} × ${s.y}`:`${s.x} × ${s.y} × ${s.z}`}
-  function dimensions(s){
-    const staggered=mode==='staggered'&&s.y>1;
-    return{
-      length:s.x*s.d+(staggered?s.d/2:0),
-      width:staggered?s.d+(s.y-1)*s.d*SQRT3_OVER_2:s.y*s.d,
-      height:layers(s)*s.h
-    };
-  }
+  function layers(s){return s.layers}
+  function complete(s){return s.valid===true}
+  function layerLabel(s){return coreLayerLabel(s.layers)}
+  function layoutText(s){return coreLayoutText(s)}
+  function dimensions(s){return{length:s.length,width:s.width,height:s.height}}
 
   function saveLast(){
     const s=state(); if(!complete(s))return;
-    try{localStorage.setItem(LAST_KEY,JSON.stringify({...s,mode}))}catch{}
+    try{localStorage.setItem(LAST_KEY,JSON.stringify({d:s.d,h:s.h,x:s.x,y:s.y,z:s.z,mode:s.mode}))}catch{}
   }
   function restoreLast(){
     try{
