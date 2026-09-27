@@ -1,4 +1,5 @@
 import { calculateCutCalc } from './cutcalc-core.mjs';
+import { updateWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -45,8 +46,22 @@ import { calculateCutCalc } from './cutcalc-core.mjs';
   function putHistory(items){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(items.slice(0,MAX_HISTORY)))}catch{}}
   function signature(i,r){return JSON.stringify({material:i.material||'',diameter:+i.diameter||0,partLength:+i.partLength||0,quantity:+i.quantity||0,kerf:+i.kerf||0,faceA:+i.faceA||0,faceB:+i.faceB||0,stockLength:+i.stockLength||0,stockFace:+i.stockFace||0,reservePct:+i.reservePct||0,purchaseLength:+r.purchaseLength||0})}
   function saveSnapshot(){
-    if(!lastResult?.valid)return;const sig=signature(lastResult.input,lastResult),list=history();if(list.some(x=>x.signature===sig))return;
-    list.unshift({id:Date.now()+'-'+Math.random().toString(16).slice(2,8),createdAt:new Date().toISOString(),signature:sig,input:lastResult.input,result:{purchaseLength:lastResult.purchaseLength}});putHistory(list);
+    if(!lastResult?.valid)return;
+    const sig=signature(lastResult.input,lastResult),list=history();
+    const item={id:Date.now()+'-'+Math.random().toString(16).slice(2,8),createdAt:new Date().toISOString(),signature:sig,input:lastResult.input,result:{purchaseLength:lastResult.purchaseLength}};
+    updateWorkspace(w=>({
+      material:lastResult.input.material?{...(w.material||{}),label:lastResult.input.material}:w.material,
+      stock:{
+        material:lastResult.input.material||'',
+        diameter:lastResult.input.diameter||null,
+        partLength:lastResult.input.partLength||null,
+        quantity:lastResult.input.quantity||null,
+        stockLength:lastResult.input.stockLength||null
+      },
+      results:{cutcalc:{...item.result,input:item.input,createdAt:item.createdAt}}
+    }),{source:'cutcalc'});
+    if(list.some(x=>x.signature===sig))return;
+    list.unshift(item);putHistory(list);
   }
   function dateText(iso){
     const d=new Date(iso);if(Number.isNaN(d.valueOf()))return'';const now=new Date();
