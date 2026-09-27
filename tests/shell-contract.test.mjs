@@ -64,7 +64,7 @@ test('approved material cards are real WebP files and cached offline',()=>{
 });
 
 test('critical native modules are part of offline app shell',()=>{
-  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/modes-data.mjs','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs','./modules/profile.css','./modules/profile.js','./modules/module-registry.mjs','./modules/machine-store.mjs','./modules/tools.css','./modules/tools.js','./modules/projects.css','./modules/projects.js','./modules/workspace-store.mjs','./modules/workflow.css','./modules/workflow.js']){
+  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/modes-data.mjs','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs','./modules/profile.css','./modules/profile.js','./modules/module-registry.mjs','./modules/machine-store.mjs','./modules/tools.css','./modules/tools.js','./modules/projects.css','./modules/projects.js','./modules/workspace-store.mjs','./modules/workflow.css','./modules/workflow.js','./modules/result-core.mjs','./modules/result.css','./modules/result.js']){
     assert.ok(sw.includes(path),`Missing offline cache entry: ${path}`);
   }
 });
@@ -147,7 +147,7 @@ test('Copilot does not overwrite workspace during boot',()=>{
 
 
 test('service worker prevents mixed shell versions in Safari',()=>{
-  assert.match(sw,/const VERSION = '1\.0\.2'/);
+  assert.match(sw,/const VERSION = '1\.1\.0'/);
   assert.match(sw,/async function freshFirst/);
   assert.match(sw,/cache:\s*'reload'/);
   assert.match(sw,/request\.destination === 'script'/);
@@ -160,4 +160,23 @@ test('production modules never fall back to placeholder view',()=>{
   const app=fs.readFileSync('app.js','utf8');
   assert.doesNotMatch(app,/setActiveView\('module'\)/);
   assert.match(app,/CNC module view is missing/);
+});
+
+
+test('final workflow result is wired and offline-ready',()=>{
+  assert.match(index,/id="workflowResult"/);
+  assert.match(index,/id="workflowResultOps"/);
+  assert.match(index,/id="workflowResultCode"/);
+  assert.match(index,/id="resultDownloadNc"/);
+  assert.match(index,/modules\/result\.css/);
+  assert.match(index,/modules\/result\.js/);
+  for(const path of ['./modules/result-core.mjs','./modules/result.css','./modules/result.js']){
+    assert.ok(sw.includes(path),`Missing final result offline cache entry: ${path}`);
+  }
+});
+
+test('workflow result step scrolls to real final result',()=>{
+  const workflow=fs.readFileSync('modules/workflow.js','utf8');
+  assert.match(workflow,/workflowResult/);
+  assert.match(workflow,/scrollIntoView/);
 });
