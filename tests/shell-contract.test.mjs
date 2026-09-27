@@ -59,6 +59,7 @@ test('approved material cards are real WebP files and cached offline',()=>{
     const data=fs.readFileSync(path);
     assert.equal(data.subarray(0,4).toString('ascii'),'RIFF');
     assert.equal(data.subarray(8,12).toString('ascii'),'WEBP');
+    assert.equal(data.readUInt32LE(4)+8,data.length,`${path} is truncated`);
     assert.ok(sw.includes('./'+path),`Service worker does not cache ${path}`);
   }
 });
@@ -147,7 +148,7 @@ test('Copilot does not overwrite workspace during boot',()=>{
 
 
 test('service worker prevents mixed shell versions in Safari',()=>{
-  assert.match(sw,/const VERSION = '1\.2\.0'/);
+  assert.match(sw,/const VERSION = '1\.2\.1'/);
   assert.match(sw,/async function freshFirst/);
   assert.match(sw,/cache:\s*'reload'/);
   assert.match(sw,/request\.destination === 'script'/);
