@@ -1,4 +1,5 @@
 import { CALCULATORS, MATERIALS, THREADS, round } from './geometry-core.mjs';
+import { updateWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -155,7 +156,12 @@ import { CALCULATORS, MATERIALS, THREADS, round } from './geometry-core.mjs';
   function saveCurrent(){
     if(!state.result)return;const projects=getProjects(),existing=state.currentProjectId&&projects.find(p=>p.id===state.currentProjectId);
     const name=prompt('Название проекта',existing?.name||(state.result.title+' • '+new Date().toLocaleDateString('ru-RU')));if(!name)return;
-    const item={id:existing?.id||uid(),name,calc:state.calc,values:state.values,result:state.result,updated:Date.now()},next=projects.filter(p=>p.id!==item.id);next.unshift(item);saveProjects(next);state.currentProjectId=item.id;alert('Проект сохранён локально');
+    const item={id:existing?.id||uid(),name,calc:state.calc,values:state.values,result:state.result,updated:Date.now()},next=projects.filter(p=>p.id!==item.id);next.unshift(item);saveProjects(next);state.currentProjectId=item.id;
+    updateWorkspace(w=>({
+      title:w.title==='Новая деталь'?name:w.title,
+      geometry:{id:item.id,name:item.name,calc:item.calc,values:item.values,result:item.result,updated:item.updated}
+    }),{source:'geometry'});
+    alert('Проект сохранён локально и добавлен в рабочий процесс');
   }
 
   function renderProjects(){
