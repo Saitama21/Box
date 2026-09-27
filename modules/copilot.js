@@ -1,20 +1,18 @@
 import { calculateMachining, OPERATIONS } from './copilot-core.mjs';
 import { MATERIALS } from './copilot-materials.mjs';
+import { defaultMachine, loadMachine, saveMachine, subscribeMachine } from './machine-store.mjs';
 
 (() => {
   'use strict';
 
   const D=window.CNC_DATA||{};
-  const MACHINE_KEY='cncFullMachineV1';
   const ROUTE_KEY='cnc-suite.copilot.route-v1';
   const $=id=>document.getElementById(id);
   const isoColors={P:'#2788ff',M:'#f3cc28',K:'#e94b4b',N:'#39b95a',S:'#c77a3a',H:'#9ba3ad'};
-  const defaults=D.machineDefault||{name:'Tengyue CK52PT-Y',control:'SINUMERIK 828D / ShopTurn',maxRpm:4000,spindleKw:17,efficiency:.85,chuckCylinder:{maxRpm:6000,model:'BK-1552'},motor:{maxRpm:8000,model:'1PH8137-1DD02-0CA1'}};
+  const defaults=defaultMachine();
 
   const state={step:1,machine:loadMachine(),materialCode:'AISI304',stockDia:50,route:[],mode:'normal',results:[]};
 
-  function loadMachine(){try{return{...defaults,...JSON.parse(localStorage.getItem(MACHINE_KEY)||'{}')}}catch{return{...defaults}}}
-  function saveMachine(){try{localStorage.setItem(MACHINE_KEY,JSON.stringify(state.machine))}catch{}}
   function saveRoute(){try{localStorage.setItem(ROUTE_KEY,JSON.stringify({materialCode:state.materialCode,stockDia:state.stockDia,route:state.route,mode:state.mode}))}catch{}}
   function restoreRoute(){try{const v=JSON.parse(localStorage.getItem(ROUTE_KEY)||'null');if(v){state.materialCode=v.materialCode||state.materialCode;state.stockDia=Number(v.stockDia)||state.stockDia;state.route=Array.isArray(v.route)?v.route:[];state.mode=['reliable','normal','productive'].includes(v.mode)?v.mode:'normal'}}catch{}}
   function uid(){return crypto.randomUUID?.()||'op-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
@@ -35,7 +33,7 @@ import { MATERIALS } from './copilot-materials.mjs';
     $('copMachineLiveRpm').textContent=(state.machine.maxRpm||4000)+' rpm';$('copMachineLivePower').textContent=(state.machine.spindleKw||17)+' kW';$('copMachineLiveCylinder').textContent=(state.machine.chuckCylinder?.model||'BK-1552')+' · '+(state.machine.chuckCylinder?.maxRpm||6000);$('copMachineLiveControl').textContent='828D';
   }
   function readMachine(){
-    state.machine.maxRpm=Math.max(100,Number($('copMachineMaxRpm').value)||4000);state.machine.spindleKw=Math.max(1,Number($('copMachinePower').value)||17);state.machine.setupMaxRpm=$('copSetupMaxRpm').value?Math.max(100,Number($('copSetupMaxRpm').value)):null;saveMachine();syncMachine();
+    state.machine.maxRpm=Math.max(100,Number($('copMachineMaxRpm').value)||4000);state.machine.spindleKw=Math.max(1,Number($('copMachinePower').value)||17);state.machine.setupMaxRpm=$('copSetupMaxRpm').value?Math.max(100,Number($('copSetupMaxRpm').value)):null;state.machine=saveMachine(state.machine)||state.machine;syncMachine();
   }
 
   function renderMaterials(filter=''){
@@ -111,7 +109,7 @@ import { MATERIALS } from './copilot-materials.mjs';
     $('copAddOperation').onclick=()=>{state.route.push(makeRoute());renderRoute();saveRoute()};
     document.querySelectorAll('[data-cop-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.copMode));
     $('copRecalculate').onclick=calculateAll;
-    window.addEventListener('cnc-machine-profile-changed',e=>{state.machine={...state.machine,...(e.detail||{})};syncMachine();if(state.step===5)calculateAll()});
+    subscribeMachine(profile=>{state.machine=profile;syncMachine();if(state.step===5)calculateAll()});
   }
 
   restoreRoute();ensureRoute();syncMachine();$('copStockDia').value=state.stockDia;renderMaterials();syncMaterial();renderRoute();setMode(state.mode);bind();setStep(1);
