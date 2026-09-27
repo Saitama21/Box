@@ -64,7 +64,7 @@ test('approved material cards are real WebP files and cached offline',()=>{
 });
 
 test('critical native modules are part of offline app shell',()=>{
-  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/modes-data.mjs','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs','./modules/profile.css','./modules/profile.js']){
+  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/modes-data.mjs','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs','./modules/profile.css','./modules/profile.js','./modules/module-registry.mjs','./modules/machine-store.mjs','./modules/tools.css','./modules/tools.js','./modules/projects.css','./modules/projects.js']){
     assert.ok(sw.includes(path),`Missing offline cache entry: ${path}`);
   }
 });
@@ -85,4 +85,26 @@ test('shared machine profile is wired to unified shell',()=>{
   assert.match(index,/id="profileSave"/);
   assert.match(index,/id="homeMachineName"/);
   assert.match(index,/modules\/profile\.js/);
+});
+
+
+test('Projects hub is wired and offline-ready',()=>{
+  assert.match(index,/modules\/projects\.css/);
+  assert.match(index,/modules\/projects\.js/);
+  assert.match(index,/id="projectsList"/);
+  assert.match(index,/id="projectsExport"/);
+  assert.ok(sw.includes('./modules/projects.css'));
+  assert.ok(sw.includes('./modules/projects.js'));
+});
+
+test('shell uses central module registry and shared machine store',()=>{
+  const app=fs.readFileSync('app.js','utf8');
+  const profile=fs.readFileSync('modules/profile.js','utf8');
+  const copilot=fs.readFileSync('modules/copilot.js','utf8');
+  assert.match(app,/module-registry\.mjs/);
+  assert.doesNotMatch(app,/key === 'box'.*key === 'modes'/s);
+  assert.match(profile,/machine-store\.mjs/);
+  assert.match(copilot,/machine-store\.mjs/);
+  assert.doesNotMatch(profile,/localStorage\.getItem\(['"]cncFullMachineV1/);
+  assert.doesNotMatch(copilot,/localStorage\.getItem\(['"]cncFullMachineV1/);
 });
