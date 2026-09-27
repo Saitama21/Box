@@ -16,3 +16,6 @@
 .tool-dialog-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:11px}.tool-dialog-actions button{height:38px;padding:0 12px;border-radius:10px;font-size:9px;font-weight:900}.tool-save{background:linear-gradient(180deg,#ff9d47,#dc6d13);color:#fff}.tool-delete{background:rgba(255,80,80,.06);border:1px solid rgba(255,80,80,.13);color:#ff9999}
 @media(max-width:650px){.tools-grid{grid-template-columns:1fr}.tools-hero-stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:420px){.tool-form-grid{grid-template-columns:1fr}.tool-field.wide{grid-column:auto}.tools-hero-stats span{font-size:6.8px}.tools-hero-stats strong{font-size:10.5px}}
+
+.tool-card-actions button.use-workflow{width:auto;min-width:61px;padding:0 7px;color:var(--green);border-color:rgba(73,228,151,.14);background:rgba(4,25,18,.75);font-size:7.5px;font-weight:900}
+html[data-theme="light"] .tool-card-actions button.use-workflow{background:rgba(73,228,151,.08)}
