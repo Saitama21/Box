@@ -15,7 +15,8 @@ test('Modes material set remains stable',()=>{
 
 test('Modes material cards use local WebP assets',()=>{
   for(const material of MODES_MATERIALS){
-    assert.match(material.art,/^./assets/modes/.+.webp$/);
+    assert.equal(material.art.startsWith('./assets/modes/'),true);
+    assert.equal(material.art.endsWith('.webp'),true);
     const path=material.art.replace('./','');
     const data=fs.readFileSync(path);
     assert.equal(data.subarray(0,4).toString('ascii'),'RIFF');
