@@ -1,4 +1,5 @@
 import { MODES_DB_NAME, MODES_DB_VERSION, MODES_STORE } from './modes-data.mjs';
+import { loadWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -118,6 +119,7 @@ import { MODES_DB_NAME, MODES_DB_VERSION, MODES_STORE } from './modes-data.mjs';
 
   async function snapshot(){
     return{
+      workspace:loadWorkspace(),
       modes:await modes(),
       cutcalc:list(KEYS.cutcalc),
       geometry:list(KEYS.geometry),
