@@ -1,5 +1,5 @@
 import { CALCULATORS, MATERIALS, THREADS, round } from './geometry-core.mjs';
-import { updateWorkspace } from './workspace-store.mjs';
+import { updateWorkspace, loadWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -189,6 +189,11 @@ import { updateWorkspace } from './workspace-store.mjs';
     $('geometryBackCalc').onclick=()=>setScreen('home');$('geometryBackResult').onclick=()=>{renderForm();setScreen('calc')};
     $('geometryCopy').onclick=copyCode;$('geometrySave').onclick=saveCurrent;$('geometryPng').onclick=exportPng;$('geometryPrint').onclick=()=>window.print();$('geometryNew').onclick=()=>openCalc(state.calc);
     $('geometryQuickSphere').onclick=()=>openCalc('sphereCube');$('geometryQuickLobes').onclick=()=>openCalc('lobes');$('geometryQuickPcd').onclick=()=>openCalc('pcd');
+    window.addEventListener('cnc-module-opened',event=>{
+      if(event.detail?.id!=='geometry')return;
+      const g=loadWorkspace().geometry;
+      if(g?.calc)openCalc(g.calc,g.values||null,g.id||null);
+    });
   }
 
   renderHome();bind();renderProjects();
