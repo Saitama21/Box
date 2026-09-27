@@ -1,7 +1,7 @@
 import { calculateMachining, OPERATIONS } from './copilot-core.mjs';
 import { MATERIALS } from './copilot-materials.mjs';
 import { defaultMachine, loadMachine, saveMachine, subscribeMachine } from './machine-store.mjs';
-import { updateWorkspace } from './workspace-store.mjs';
+import { updateWorkspace, loadWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -58,6 +58,29 @@ import { updateWorkspace } from './workspace-store.mjs';
   }
   function syncMaterial(){
     const m=material();$('copSelectedMaterial').textContent=m.code+' · '+m.name;$('copSelectedIso').textContent='ISO '+m.iso;$('copMaterialNote').textContent=m.note||'Стартовый профиль материала загружен.';
+  }
+
+  function workspaceMaterialCode(workspace){
+    const raw=String(workspace?.material?.code||workspace?.material?.id||workspace?.material?.label||'').trim().toLowerCase();
+    if(!raw)return null;
+    const found=MATERIALS.find(m=>[m.code,m.id,m.name,...(m.aliases||[])].filter(Boolean).some(v=>String(v).trim().toLowerCase()===raw));
+    return found?.code||null;
+  }
+
+  function hydrateWorkspace(){
+    const w=loadWorkspace();
+    const code=workspaceMaterialCode(w);
+    if(code)state.materialCode=code;
+    if(Number(w.stock?.diameter)>0)state.stockDia=Number(w.stock.diameter);
+    if(Array.isArray(w.operations)&&w.operations.length)state.route=w.operations.map(r=>({...r}));
+    if(w.machine&&typeof w.machine==='object')state.machine={...state.machine,...w.machine};
+    ensureRoute();
+    syncMachine();
+    $('copStockDia').value=state.stockDia;
+    renderMaterials($('copMaterialSearch')?.value||'');
+    syncMaterial();
+    renderRoute();
+    setMode(state.mode);
   }
 
   function makeRoute(operation='turning'){return{id:uid(),operation,diameterMm:state.stockDia||50,cutType:'semi',threadPitchMm:'',toolDiameterMm:'',cutLengthMm:'',passes:1,customVc:'',customFeed:'',customAp:''}}
@@ -142,8 +165,11 @@ import { updateWorkspace } from './workspace-store.mjs';
     document.querySelectorAll('[data-cop-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.copMode));
     $('copRecalculate').onclick=calculateAll;
     subscribeMachine(profile=>{state.machine=profile;syncMachine();if(state.step===5)calculateAll()});
-    window.addEventListener('cnc-module-opened',e=>{if(e.detail?.id==='copilot'&&state.workspaceSyncReady)syncWorkspaceRoute()});
+    window.addEventListener('cnc-module-opened',e=>{
+      if(e.detail?.id!=='copilot')return;
+      const wasReady=state.workspaceSyncReady;state.workspaceSyncReady=false;hydrateWorkspace();state.workspaceSyncReady=wasReady||true;
+    });
   }
 
-  restoreRoute();ensureRoute();syncMachine();$('copStockDia').value=state.stockDia;renderMaterials();syncMaterial();renderRoute();setMode(state.mode);bind();setStep(1);state.workspaceSyncReady=true;if(document.getElementById('app')?.dataset.module==='copilot')syncWorkspaceRoute();
+  restoreRoute();ensureRoute();syncMachine();$('copStockDia').value=state.stockDia;renderMaterials();syncMaterial();renderRoute();setMode(state.mode);bind();setStep(1);state.workspaceSyncReady=true;if(document.getElementById('app')?.dataset.module==='copilot')hydrateWorkspace();
 })();
