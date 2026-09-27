@@ -57,6 +57,7 @@ import { MODULE_REGISTRY, SHELL_ROUTES, moduleIds, moduleMeta, resolveView, isSh
       history.replaceState({ route: target }, '', location.pathname + location.search + (target === 'home' ? '' : '#route='+target));
     }
 
+    window.dispatchEvent(new CustomEvent('cnc-route-opened',{detail:{route:target}}));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
