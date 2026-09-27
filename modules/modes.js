@@ -153,8 +153,8 @@
   function bind(){
     document.querySelectorAll('[data-modes-nav]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.modesNav==='home'){renderDeck();setView('home')}else{renderSearch();setView('search')}}));
     $('modesAdd').onclick=()=>openForm();$('modesBackMaterial').onclick=()=>{renderDeck();setView('home')};$('modesPrev').onclick=()=>move(-1);$('modesNext').onclick=()=>move(1);$('modesEmptyAdd').onclick=()=>openForm();$('modesEdit').onclick=()=>openForm(currentRecord());
-    $('modesRecordForm').addEventListener('submit',saveForm);$('modesDelete').onclick=removeCurrent;$('modesSearchInput').addEventListener('input',renderSearch);$('modesClearSearch').onclick=()=>{$('modesSearchInput').value='';renderSearch()};
-    $('modesNote').onclick=()=>{const r=currentRecord();if(!r?.note)return;$('modesNoteTitle').textContent=r.title||'Заметка';$('modesNoteFull').textContent=r.note;$('modesNoteDialog').showModal()};
+    $('modesRecordForm').addEventListener('submit',saveForm);$('modesRecordClose').onclick=()=>$('modesRecordDialog').close();$('modesDelete').onclick=removeCurrent;$('modesSearchInput').addEventListener('input',renderSearch);$('modesClearSearch').onclick=()=>{$('modesSearchInput').value='';renderSearch()};
+    $('modesNote').onclick=()=>{const r=currentRecord();if(!r?.note)return;$('modesNoteTitle').textContent=r.title||'Заметка';$('modesNoteFull').textContent=r.note;$('modesNoteDialog').showModal()};$('modesNoteClose').onclick=()=>$('modesNoteDialog').close();$('modesMenuClose').onclick=()=>$('modesMenuDialog').close();
     $('modesMenu').onclick=()=>$('modesMenuDialog').showModal();$('modesExport').onclick=exportData;$('modesImport').onchange=async e=>{try{if(e.target.files[0])await importData(e.target.files[0])}catch{alert('Не удалось импортировать файл')}};
   }
 
