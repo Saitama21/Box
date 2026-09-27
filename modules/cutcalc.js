@@ -1,5 +1,5 @@
 import { calculateCutCalc } from './cutcalc-core.mjs';
-import { updateWorkspace } from './workspace-store.mjs';
+import { updateWorkspace, loadWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -83,6 +83,18 @@ import { updateWorkspace } from './workspace-store.mjs';
     }
   }
   function load(data){for(const id of ids){const n=node(id);if(n)n.value=data[id.charAt(0).toLowerCase()+id.slice(1)]??''}render();window.scrollTo({top:0,behavior:'smooth'})}
+  function hydrateWorkspace(){
+    const w=loadWorkspace(),saved=w.results?.cutcalc?.input||null;
+    const data=saved||{
+      material:w.material?.label||w.material?.name||w.material?.title||'',
+      diameter:w.stock?.diameter??'',
+      partLength:w.stock?.partLength??'',
+      quantity:w.stock?.quantity??'',
+      stockLength:w.stock?.stockLength??''
+    };
+    if(Object.values(data).some(v=>String(v??'').trim()!==''))load(data);
+  }
+
   function clearAll(){for(const id of ids){const n=node(id);if(n)n.value=''}resetResult();$('cutBarDetails').open=false}
   function show(name){
     if(name==='history')saveSnapshot();
@@ -97,6 +109,7 @@ import { updateWorkspace } from './workspace-store.mjs';
     $('cutClearAll').onclick=clearAll;document.querySelectorAll('[data-cut-tab]').forEach(b=>b.onclick=()=>show(b.dataset.cutTab));
     $('cutClearHistory').onclick=()=>{if(history().length&&confirm('Удалить всю историю расчётов?')){putHistory([]);renderHistory()}};
     window.addEventListener('online',network,{passive:true});window.addEventListener('offline',network,{passive:true});
+    window.addEventListener('cnc-module-opened',event=>{if(event.detail?.id==='cutcalc')hydrateWorkspace()});
     resetResult();renderHistory();network();
   }
   init();
