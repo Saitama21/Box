@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="./modules/cutcalc.css">
   <link rel="stylesheet" href="./modules/geometry.css">
   <link rel="stylesheet" href="./modules/copilot.css">
+  <link rel="stylesheet" href="./modules/codes.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -219,6 +220,34 @@
           <div class="modes-search-box"><span>⌕</span><input id="modesSearchInput" type="search" placeholder="Деталь, материал, инструмент…" autocomplete="off"><button id="modesClearSearch" type="button" aria-label="Очистить">×</button></div>
           <div class="modes-search-results" id="modesSearchResults"></div>
         </section>
+      </section>
+
+      <section class="view codes-view" data-view="codes">
+        <div class="codes-head">
+          <div class="codes-head-left">
+            <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
+            <div class="codes-head-copy"><small>SINUMERIK 828D · CK52PT-Y</small><strong>CNC Copilot — Справочник кодов</strong></div>
+          </div>
+          <span class="codes-ready"><i></i><span>ОФЛАЙН ГОТОВ</span></span>
+        </div>
+
+        <div class="codes-tabs">
+          <button class="is-active" data-code-tab="M" type="button">M-коды</button>
+          <button data-code-tab="G" type="button">G-коды</button>
+          <button data-code-tab="favorites" type="button">☆ Избранное</button>
+        </div>
+
+        <div class="codes-search">
+          <span>⌕</span><input id="codesSearch" type="search" placeholder="Код или описание…" autocomplete="off"><button id="codesClear" type="button" aria-label="Очистить">×</button>
+        </div>
+        <div class="codes-categories" id="codesCategories"></div>
+        <div class="codes-quick" id="codesQuick"></div>
+        <div class="codes-count"><span id="codesCountLabel">M-коды</span><strong id="codesCount">0</strong></div>
+
+        <div class="codes-layout">
+          <section class="codes-list" id="codesList" aria-live="polite"></section>
+          <aside class="codes-detail" id="codesDetail"></aside>
+        </div>
       </section>
 
       <section class="view copilot-view" data-view="copilot">
@@ -644,5 +673,6 @@
   <script type="module" src="./modules/geometry.js"></script>
   <script src="./modules/copilot-data.js" defer></script>
   <script type="module" src="./modules/copilot.js"></script>
+  <script type="module" src="./modules/codes.js"></script>
 </body>
 </html>
