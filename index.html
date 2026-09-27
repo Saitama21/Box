@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="./modules/geometry.css">
   <link rel="stylesheet" href="./modules/copilot.css">
   <link rel="stylesheet" href="./modules/codes.css">
+  <link rel="stylesheet" href="./modules/profile.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -604,12 +605,62 @@
       </section>
 
       <section class="view simple-view" data-view="profile">
-        <div class="simple-title"><p class="eyebrow">ПРОФИЛЬ СТАНКА</p><h2>CK52PT-Y · 828D</h2><p>Общие параметры станка для всех модулей.</p></div>
-        <div class="profile-grid">
-          <article><small>Шпиндель</small><strong>4000 rpm</strong><span>A2-6 · 11 kW</span></article>
-          <article><small>Револьвер</small><strong>15 позиций</strong><span>BMT40 / ER25</span></article>
-          <article><small>Стойка</small><strong>828D</strong><span>ShopTurn</span></article>
-          <article><small>Оси</small><strong>X / Z / Y / C</strong><span>единый профиль</span></article>
+        <div class="machine-profile">
+          <section class="machine-profile-hero">
+            <small>ОБЩИЙ ПРОФИЛЬ СТАНКА</small>
+            <h2 id="profileHeroName">Tengyue CK52PT-Y</h2>
+            <p id="profileHeroControl">SINUMERIK 828D / ShopTurn</p>
+            <div class="machine-profile-badges"><span class="verified">● VERIFIED HARDWARE</span><span>A2-6</span><span>15 позиций · BMT40 / ER25</span><span>X / Z / Y / C</span></div>
+            <div class="machine-limit-card"><div class="machine-limit-ring"><span id="profileEffectiveLimit">4000</span></div><div><strong>Эффективный лимит шпинделя</strong><span id="profileLimitText">G96 / LIMS будет ограничен минимальным физическим пределом.</span></div></div>
+          </section>
+
+          <div class="machine-profile-grid">
+            <section class="machine-profile-panel">
+              <div class="machine-profile-title"><div><small>СТАНОК</small><strong>Основные параметры</strong></div><span>общие для модулей</span></div>
+              <div class="machine-profile-fields">
+                <label class="machine-profile-field wide"><span>Название</span><input id="profileMachineName"></label>
+                <label class="machine-profile-field wide"><span>Стойка</span><input id="profileControl"></label>
+                <label class="machine-profile-field"><span>Макс. RPM</span><input id="profileMaxRpm" inputmode="numeric"></label>
+                <label class="machine-profile-field"><span>Расчётная мощность, kW</span><input id="profilePower" inputmode="decimal"></label>
+                <label class="machine-profile-field"><span>КПД</span><input id="profileEfficiency" inputmode="decimal"></label>
+                <label class="machine-profile-field"><span>Лимит патрона/кулачков, RPM</span><input id="profileSetupRpm" inputmode="numeric" placeholder="не задан"></label>
+              </div>
+            </section>
+
+            <section class="machine-profile-panel">
+              <div class="machine-profile-title"><div><small>МЕХАНИКА</small><strong>Шпиндель и револьвер</strong></div></div>
+              <div class="machine-profile-fields">
+                <label class="machine-profile-field"><span>Нос шпинделя</span><input id="profileSpindle"></label>
+                <label class="machine-profile-field"><span>Отверстие шпинделя, мм</span><input id="profileBore" inputmode="decimal"></label>
+                <label class="machine-profile-field wide"><span>Револьвер</span><input id="profileTurret"></label>
+                <label class="machine-profile-field wide"><span>Оси</span><input id="profileAxes"></label>
+              </div>
+            </section>
+
+            <section class="machine-profile-panel">
+              <div class="machine-profile-title"><div><small>ЗАЖИМ</small><strong>Гидроцилиндр</strong></div><span>ограничение RPM</span></div>
+              <div class="machine-profile-fields">
+                <label class="machine-profile-field"><span>Модель</span><input id="profileCylinderModel"></label>
+                <label class="machine-profile-field"><span>Макс. RPM</span><input id="profileCylinderRpm" inputmode="numeric"></label>
+              </div>
+              <div class="machine-hardware"><div class="machine-hardware-row"><span>Подтверждённый профиль</span><strong>BK-1552 · max 6000 rpm</strong></div><div class="machine-hardware-row"><span>Макс. давление</span><strong>≈ 44.1 bar</strong></div></div>
+            </section>
+
+            <section class="machine-profile-panel">
+              <div class="machine-profile-title"><div><small>ПРИВОД</small><strong>Двигатель шпинделя</strong></div><span>SIMOTICS M</span></div>
+              <div class="machine-profile-fields">
+                <label class="machine-profile-field"><span>Модель</span><input id="profileMotorModel"></label>
+                <label class="machine-profile-field"><span>Макс. RPM</span><input id="profileMotorRpm" inputmode="numeric"></label>
+              </div>
+              <div class="machine-hardware"><div class="machine-hardware-row"><span>Непрерывная расчётная база</span><strong>17 kW</strong></div><div class="machine-hardware-row"><span>Политика</span><strong>консервативная S1</strong></div></div>
+            </section>
+
+            <section class="machine-profile-panel wide">
+              <div class="machine-profile-title"><div><small>ХРАНЕНИЕ</small><strong>Единый профиль</strong></div><span>cncFullMachineV1</span></div>
+              <div class="machine-hardware"><div class="machine-hardware-row"><span>Используется</span><strong>CNC Copilot · общий профиль · будущие модули</strong></div><div class="machine-hardware-row"><span>Хранение</span><strong>локально на устройстве · offline-first</strong></div></div>
+              <div class="machine-profile-actions"><button class="machine-profile-secondary" id="profileExport" type="button">Экспорт JSON</button><button class="machine-profile-secondary" id="profileReset" type="button">Вернуть профиль</button><button class="machine-profile-save" id="profileSave" type="button">Сохранить профиль</button></div>
+            </section>
+          </div>
         </div>
       </section>
     </main>
@@ -674,5 +725,6 @@
   <script src="./modules/copilot-data.js" defer></script>
   <script type="module" src="./modules/copilot.js"></script>
   <script type="module" src="./modules/codes.js"></script>
+  <script src="./modules/profile.js" defer></script>
 </body>
 </html>
