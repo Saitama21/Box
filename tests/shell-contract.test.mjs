@@ -136,3 +136,11 @@ test('production modules publish results into active workspace',()=>{
   assert.match(tools,/workspace-store\.mjs/);
   assert.match(copilot,/workspace-store\.mjs/);
 });
+
+
+test('Copilot does not overwrite workspace during boot',()=>{
+  const copilot=fs.readFileSync('modules/copilot.js','utf8');
+  assert.match(copilot,/workspaceSyncReady:false/);
+  assert.match(copilot,/if\(state\.workspaceSyncReady\)syncWorkspaceRoute\(\)/);
+  assert.match(copilot,/state\.workspaceSyncReady=true/);
+});
