@@ -74,25 +74,31 @@
       button.classList.toggle('is-active', button.dataset.route === target);
     });
     app.dataset.route = target;
+    delete app.dataset.module;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function openModule(key) {
     const meta = modules[key];
     if (!meta) return;
-    moduleEyebrow.textContent = meta.eyebrow;
-    moduleTitle.textContent = meta.title;
-    moduleDescription.textContent = meta.description;
-    moduleShellIcon.className = 'module-shell-icon';
-    moduleShellIcon.dataset.module = key;
+
+    const targetView = key === 'box' ? 'box' : 'module';
+
+    if (targetView === 'module') {
+      moduleEyebrow.textContent = meta.eyebrow;
+      moduleTitle.textContent = meta.title;
+      moduleDescription.textContent = meta.description;
+      moduleShellIcon.className = 'module-shell-icon';
+      moduleShellIcon.dataset.module = key;
+    }
 
     document.querySelectorAll('.view').forEach(view => {
-      view.classList.toggle('is-active', view.dataset.view === 'module');
+      view.classList.toggle('is-active', view.dataset.view === targetView);
     });
     document.querySelectorAll('.dock-item').forEach(button => {
       button.classList.remove('is-active');
     });
-    app.dataset.route = 'module';
+    app.dataset.route = targetView;
     app.dataset.module = key;
     history.replaceState({ module: key }, '', '#'+key);
     window.scrollTo({ top: 0, behavior: 'smooth' });
