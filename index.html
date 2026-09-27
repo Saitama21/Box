@@ -26,6 +26,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./modules/box.css">
+  <link rel="stylesheet" href="./modules/modes.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -148,6 +149,75 @@
         </div>
       </section>
 
+      <section class="view modes-view" data-view="modes">
+        <div class="modes-head">
+          <div class="modes-head-left">
+            <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
+            <div class="modes-head-copy"><small>CNC REFERENCE</small><strong>Режимы · Моя база</strong></div>
+          </div>
+          <div class="modes-actions">
+            <button class="modes-action is-active" data-modes-nav="home" type="button"><span>Материалы</span> ◇</button>
+            <button class="modes-action" data-modes-nav="search" type="button"><span>Поиск</span> ⌕</button>
+            <button class="modes-action add" id="modesAdd" type="button" aria-label="Добавить запись">＋</button>
+            <button class="modes-action add" id="modesMenu" type="button" aria-label="Меню">•••</button>
+          </div>
+        </div>
+
+        <section class="modes-screen is-active" data-modes-screen="home">
+          <div class="modes-material-deck" id="modesMaterialDeck"></div>
+          <div class="modes-experience">
+            <div><small>МОЯ БАЗА — МОЁ ПРЕИМУЩЕСТВО</small><strong>Проверенные режимы. Реальные детали.</strong></div>
+            <div><b id="modesRecordTotal">0</b><span>записей</span></div>
+          </div>
+        </section>
+
+        <section class="modes-screen" data-modes-screen="detail">
+          <div class="modes-detail-head">
+            <button class="modes-mini-button" id="modesBackMaterial" type="button" aria-label="Назад">‹</button>
+            <div class="modes-detail-copy"><small id="modesDetailTag">AISI 304</small><strong>Проверенный режим</strong><span id="modesDetailSub">НЕРЖАВЕЙКА</span></div>
+            <button class="modes-mini-button" id="modesEdit" type="button" aria-label="Редактировать">✎</button>
+          </div>
+
+          <article class="modes-record-card" id="modesRecordCard">
+            <div class="modes-record-visual">
+              <img id="modesRecordImage" alt="" hidden>
+              <div class="modes-record-fallback" id="modesRecordFallback"><div class="modes-metal-ring"></div></div>
+              <span class="modes-record-index" id="modesRecordIndex">1 / 1</span>
+            </div>
+            <div class="modes-record-body">
+              <div class="modes-record-title-row">
+                <div><strong id="modesRecordTitle">Фланец Ø185</strong><small id="modesRecordDate">Проверенный режим</small></div>
+                <button class="modes-note-btn" id="modesNote" type="button" aria-label="Заметка">▤</button>
+              </div>
+              <div class="modes-param-grid">
+                <div class="modes-param"><span>Заготовка</span><strong id="modesDia">—</strong></div>
+                <div class="modes-param"><span>Операция</span><strong id="modesOperation">—</strong></div>
+                <div class="modes-param"><span>Обороты</span><strong id="modesRpm">—</strong></div>
+                <div class="modes-param"><span>Подача</span><strong id="modesFeed">—</strong></div>
+                <div class="modes-param"><span>Глубина</span><strong id="modesDepth">—</strong></div>
+                <div class="modes-param"><span>Инструмент</span><strong id="modesTool">—</strong></div>
+              </div>
+              <div class="modes-note-preview" id="modesNotePreview" hidden></div>
+              <div class="modes-record-controls">
+                <button class="modes-round" id="modesPrev" type="button" aria-label="Предыдущая запись">‹</button>
+                <span id="modesCounter">1 / 1</span>
+                <button class="modes-round" id="modesNext" type="button" aria-label="Следующая запись">›</button>
+              </div>
+            </div>
+          </article>
+
+          <div class="modes-empty" id="modesEmpty" hidden>
+            <span>＋</span><h3>Пока пусто</h3><p>Добавь первый проверенный режим для этого материала.</p>
+            <button class="modes-primary" id="modesEmptyAdd" type="button">Добавить запись</button>
+          </div>
+        </section>
+
+        <section class="modes-screen" data-modes-screen="search">
+          <div class="modes-search-box"><span>⌕</span><input id="modesSearchInput" type="search" placeholder="Деталь, материал, инструмент…" autocomplete="off"><button id="modesClearSearch" type="button" aria-label="Очистить">×</button></div>
+          <div class="modes-search-results" id="modesSearchResults"></div>
+        </section>
+      </section>
+
       <section class="view box-view" data-view="box">
         <div class="box-module-head">
           <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
@@ -261,8 +331,52 @@
     </nav>
   </div>
 
+  <dialog class="modes-dialog" id="modesRecordDialog">
+    <form class="modes-dialog-inner" id="modesRecordForm">
+      <div class="modes-dialog-head">
+        <div><small>ЛИЧНАЯ ЗАПИСЬ</small><h3 id="modesFormTitle">Новый режим</h3></div>
+        <button class="modes-dialog-close" id="modesRecordClose" type="button">×</button>
+      </div>
+      <div class="modes-form-grid">
+        <label class="modes-field"><span>Материал</span><select id="modesFormMaterial" required></select></label>
+        <label class="modes-field wide"><span>Название детали</span><input id="modesFormName" required placeholder="Напр. Фланец Ø185"></label>
+        <label class="modes-field"><span>Ø заготовки, мм</span><input id="modesFormDia" inputmode="decimal" placeholder="185"></label>
+        <label class="modes-field"><span>Операция</span><input id="modesFormOperation" placeholder="Расточка"></label>
+        <label class="modes-field"><span>Обороты, rpm</span><input id="modesFormRpm" inputmode="decimal" placeholder="500"></label>
+        <label class="modes-field"><span>Подача, мм/об</span><input id="modesFormFeed" inputmode="decimal" placeholder="0.06"></label>
+        <label class="modes-field"><span>Глубина, мм</span><input id="modesFormDepth" inputmode="decimal" placeholder="1.0"></label>
+        <label class="modes-field"><span>Инструмент</span><input id="modesFormTool" placeholder="WNMG 080408"></label>
+        <label class="modes-field wide"><span>Фото детали</span><input id="modesFormPhoto" type="file" accept="image/*"></label>
+        <label class="modes-field wide"><span>Заметка</span><textarea id="modesFormNote" rows="3" placeholder="Напр. 600 rpm пищит, 500 — стабильно"></textarea></label>
+      </div>
+      <div class="modes-dialog-actions">
+        <button class="modes-danger" id="modesDelete" type="button" hidden>Удалить</button>
+        <button class="modes-primary" type="submit">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modes-dialog" id="modesNoteDialog">
+    <div class="modes-dialog-inner">
+      <div class="modes-dialog-head"><div><small>ЗАМЕТКА</small><h3 id="modesNoteTitle">Заметка</h3></div><button class="modes-dialog-close" id="modesNoteClose" type="button">×</button></div>
+      <p id="modesNoteFull" style="color:var(--muted);line-height:1.55"></p>
+    </div>
+  </dialog>
+
+  <dialog class="modes-dialog" id="modesMenuDialog">
+    <div class="modes-dialog-inner">
+      <div class="modes-dialog-head"><div><small>CNC REFERENCE</small><h3>Локальная база</h3></div><button class="modes-dialog-close" id="modesMenuClose" type="button">×</button></div>
+      <p style="color:var(--muted);font-size:11px;line-height:1.5">Записи и фотографии хранятся локально в IndexedDB. База совместима с исходным приложением Operating Modes Reference 828D на том же устройстве и origin.</p>
+      <div class="modes-dialog-actions">
+        <button class="modes-secondary" id="modesExport" type="button">Экспорт JSON</button>
+        <label class="modes-secondary" style="display:flex;align-items:center;cursor:pointer">Импорт JSON<input id="modesImport" type="file" accept="application/json" hidden></label>
+      </div>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="./app.js" defer></script>
   <script type="module" src="./modules/box.js"></script>
+  <script src="./modules/modes.js" defer></script>
 </body>
 </html>
