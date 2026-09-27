@@ -82,7 +82,7 @@
     const meta = modules[key];
     if (!meta) return;
 
-    const targetView = key === 'box' ? 'box' : key === 'modes' ? 'modes' : key === 'cutcalc' ? 'cutcalc' : key === 'geometry' ? 'geometry' : 'module';
+    const targetView = key === 'box' ? 'box' : key === 'modes' ? 'modes' : key === 'cutcalc' ? 'cutcalc' : key === 'geometry' ? 'geometry' : key === 'copilot' ? 'copilot' : 'module';
 
     if (targetView === 'module') {
       moduleEyebrow.textContent = meta.eyebrow;
