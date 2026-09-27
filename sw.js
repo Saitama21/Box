@@ -1,4 +1,4 @@
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -12,6 +12,12 @@ const APP_SHELL = [
   './modules/box-core.mjs',
   './modules/modes.css',
   './modules/modes.js',
+  './modules/cutcalc.css',
+  './modules/cutcalc.js',
+  './modules/cutcalc-core.mjs',
+  './assets/cutcalc/result-rod.webp',
+  './assets/cutcalc/rod-brass.webp',
+  './assets/cutcalc/rod-steel.webp',
   './assets/modes/card-aisi304.webp',
   './assets/modes/card-steel.webp',
   './assets/modes/card-polyamide.webp',
