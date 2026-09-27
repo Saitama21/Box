@@ -25,6 +25,7 @@
   </script>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./modules/box.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -147,6 +148,90 @@
         </div>
       </section>
 
+      <section class="view box-view" data-view="box">
+        <div class="box-module-head">
+          <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
+          <span class="box-status"><i></i>BOX · НАТИВНЫЙ МОДУЛЬ</span>
+        </div>
+
+        <div class="box-workspace">
+          <aside class="box-controls">
+            <section class="box-panel">
+              <div class="box-panel-head"><span>1</span><div><small>ДЕТАЛЬ</small><strong>Размер заготовки</strong></div></div>
+              <div class="box-fields two">
+                <label class="box-field"><span>Диаметр, мм</span><input id="boxDiameter" type="number" min="0.1" max="3000" step="0.1" inputmode="decimal" value="50"></label>
+                <label class="box-field"><span>Высота, мм</span><input id="boxHeight" type="number" min="0.1" max="3000" step="0.1" inputmode="decimal" value="20"></label>
+              </div>
+            </section>
+
+            <section class="box-panel">
+              <div class="box-panel-head"><span>2</span><div><small>УКЛАДКА</small><strong>Схема и количество</strong></div></div>
+              <div class="box-pack">
+                <div class="box-pack-caption"><span>Схема укладки</span><small id="boxPackingNote">ряды без смещения</small></div>
+                <div class="box-pack-switch" role="group" aria-label="Схема укладки">
+                  <button class="is-active" data-box-pack="straight" type="button">Ровная</button>
+                  <button data-box-pack="staggered" type="button">Шахматная</button>
+                </div>
+              </div>
+              <div class="box-fields three">
+                <label class="box-field">
+                  <span>Длина X</span>
+                  <div class="box-stepper"><button data-box-step="boxCountX" data-delta="-1" type="button">−</button><input id="boxCountX" type="number" min="1" max="999" step="1" inputmode="numeric" value="9"><button data-box-step="boxCountX" data-delta="1" type="button">+</button></div>
+                </label>
+                <label class="box-field">
+                  <span>Ширина Y</span>
+                  <div class="box-stepper"><button data-box-step="boxCountY" data-delta="-1" type="button">−</button><input id="boxCountY" type="number" min="1" max="999" step="1" inputmode="numeric" value="5"><button data-box-step="boxCountY" data-delta="1" type="button">+</button></div>
+                </label>
+                <label class="box-field">
+                  <span>Высота Z <b class="box-optional">необяз.</b></span>
+                  <div class="box-stepper"><button data-box-step="boxCountZ" data-delta="-1" type="button">−</button><input id="boxCountZ" type="number" min="1" max="999" step="1" inputmode="numeric" placeholder="1"><button data-box-step="boxCountZ" data-delta="1" type="button">+</button></div>
+                </label>
+              </div>
+              <p class="box-note">Z можно оставить пустым — считается один слой.</p>
+            </section>
+
+            <div class="box-actions">
+              <button id="boxCalculate" class="box-primary" type="button">Рассчитать</button>
+              <button id="boxReset" class="box-secondary" type="button">↻ Новый расчёт</button>
+            </div>
+
+            <section class="box-result" aria-live="polite">
+              <div class="box-result-top">
+                <div><small>ИТОГО</small><strong><b id="boxTotal">45</b> шт.</strong></div>
+                <button id="boxCopy" type="button">⧉ Скопировать</button>
+              </div>
+              <div class="box-result-lines">
+                <span id="boxResultPart">Деталь: Ø50 × 20 мм</span>
+                <span id="boxResultLayout">Укладка: 9 × 5 · 1 слой · ровная</span>
+                <span id="boxResultBlock">Габариты: 450 × 250 × 20 мм</span>
+              </div>
+            </section>
+          </aside>
+
+          <section class="box-visual" id="boxVisual">
+            <div class="box-mobile-hint"><span>Технические проекции</span><b>Листай →</b></div>
+            <div class="box-projection-grid">
+              <article class="box-projection-card">
+                <header><h3>Вид сверху <span>X × Y</span></h3><b id="boxTopSize">450 × 250 мм</b></header>
+                <div id="boxTopProjection" class="box-stage" role="img" aria-label="Вид сверху на укладку"></div>
+              </article>
+              <article class="box-projection-card">
+                <header><h3>Вид сбоку <span>X × Z</span></h3><b id="boxSideSize">450 × 20 мм</b></header>
+                <div id="boxSideProjection" class="box-stage" role="img" aria-label="Вид сбоку на укладку"></div>
+              </article>
+              <article class="box-projection-card">
+                <header><h3>Вид с торца <span>Y × Z</span></h3><b id="boxEndSize">250 × 20 мм</b></header>
+                <div id="boxEndProjection" class="box-stage" role="img" aria-label="Вид с торца на укладку"></div>
+              </article>
+              <article class="box-projection-card">
+                <header><h3>Общий вид</h3><b id="boxIsoLabel">45 деталей · 1 слой</b></header>
+                <div id="boxIsoProjection" class="box-stage" role="img" aria-label="Изометрический вид укладки"></div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+
       <section class="view simple-view" data-view="tools">
         <div class="simple-title"><p class="eyebrow">ИНСТРУМЕНТ</p><h2>Мой шкаф</h2><p>Общий инструментальный модуль будет связан с режимами, геометрией и CNC Copilot.</p></div>
         <div class="empty-panel"><span>◇</span><strong>Каркас готов</strong><p>Инструментальная база подключится отдельным этапом.</p></div>
@@ -178,5 +263,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="./app.js" defer></script>
+  <script src="./modules/box.js" defer></script>
 </body>
 </html>
