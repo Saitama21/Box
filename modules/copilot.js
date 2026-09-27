@@ -111,6 +111,7 @@ import { MATERIALS } from './copilot-materials.mjs';
     $('copAddOperation').onclick=()=>{state.route.push(makeRoute());renderRoute();saveRoute()};
     document.querySelectorAll('[data-cop-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.copMode));
     $('copRecalculate').onclick=calculateAll;
+    window.addEventListener('cnc-machine-profile-changed',e=>{state.machine={...state.machine,...(e.detail||{})};syncMachine();if(state.step===5)calculateAll()});
   }
 
   restoreRoute();ensureRoute();syncMachine();$('copStockDia').value=state.stockDia;renderMaterials();syncMaterial();renderRoute();setMode(state.mode);bind();setStep(1);
