@@ -1,20 +1,12 @@
 {
-  "name": "Box — калькулятор укладки",
-  "short_name": "Box",
-  "description": "Offline-first калькулятор количества деталей и габаритов укладки без привязки к таре.",
+  "name": "CNC Copilot — Offline Workshop",
+  "short_name": "CNC Copilot",
+  "description": "Единая offline-first CNC-система: режимы, расчёты, укладка, геометрия, напарник и справочник G/M-кодов.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f2f6f5",
-  "theme_color": "#16934f",
+  "background_color": "#050b11",
+  "theme_color": "#071019",
   "lang": "ru",
-  "orientation": "any",
-  "icons": [
-    {
-      "src": "./icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "orientation": "any"
 }
