@@ -11,5 +11,5 @@ test('every production module resolves to its own native view',()=>{
 });
 
 test('shell routes stay separate from CNC modules',()=>{
-  assert.deepEqual(SHELL_ROUTES,['home','tools','projects','profile']);
+  assert.deepEqual(SHELL_ROUTES,['home','workflow','tools','projects','profile']);
 });
