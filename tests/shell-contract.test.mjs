@@ -44,11 +44,13 @@ test('native Box and Modes modules are wired into root shell',()=>{
   assert.match(index,/data-view="cutcalc"/);
   assert.match(index,/data-view="geometry"/);
   assert.match(index,/data-view="copilot"/);
+  assert.match(index,/data-view="codes"/);
   assert.match(index,/modules\/box\.js/);
   assert.match(index,/modules\/modes\.js/);
   assert.match(index,/modules\/cutcalc\.js/);
   assert.match(index,/modules\/geometry\.js/);
   assert.match(index,/modules\/copilot\.js/);
+  assert.match(index,/modules\/codes\.js/);
 });
 
 test('approved material cards are real WebP files and cached offline',()=>{
@@ -62,7 +64,7 @@ test('approved material cards are real WebP files and cached offline',()=>{
 });
 
 test('critical native modules are part of offline app shell',()=>{
-  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js']){
+  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs']){
     assert.ok(sw.includes(path),`Missing offline cache entry: ${path}`);
   }
 });
