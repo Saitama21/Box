@@ -1,4 +1,4 @@
-export const SHELL_ROUTES = Object.freeze(['home','tools','projects','profile']);
+export const SHELL_ROUTES = Object.freeze(['home','workflow','tools','projects','profile']);
 
 export const MODULE_REGISTRY = Object.freeze({
   modes: {
