@@ -82,7 +82,7 @@
     const meta = modules[key];
     if (!meta) return;
 
-    const targetView = key === 'box' ? 'box' : 'module';
+    const targetView = key === 'box' ? 'box' : key === 'modes' ? 'modes' : 'module';
 
     if (targetView === 'module') {
       moduleEyebrow.textContent = meta.eyebrow;
