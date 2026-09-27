@@ -1,20 +1,17 @@
+import { MODES_DB_NAME, MODES_DB_VERSION, MODES_STORE, MODES_MATERIALS } from './modes-data.mjs';
+
 (() => {
   'use strict';
 
-  const MATERIALS=[
-    {id:'aisi304',title:'AISI 304',subtitle:'Нержавеющая сталь',short:'НЕРЖАВЕЙКА',rgb:'247,190,55',art:'./assets/modes/card-aisi304.webp'},
-    {id:'steel',title:'Сталь',subtitle:'Конструкционная сталь',short:'СТАЛЬ',rgb:'130,141,154',art:'./assets/modes/card-steel.webp'},
-    {id:'polyamide',title:'Полиамид',subtitle:'Технический пластик',short:'ПОЛИАМИД',rgb:'76,154,255',art:'./assets/modes/card-polyamide.webp'},
-    {id:'brass',title:'Латунь',subtitle:'Цветной сплав',short:'ЛАТУНЬ',rgb:'230,165,55',art:'./assets/modes/card-brass.webp'}
-  ];
+  const MATERIALS=MODES_MATERIALS;
   const $=id=>document.getElementById(id);
   const state={view:'home',materialIndex:0,recordIndex:0,records:[],editingId:null};
 
   const dbp=new Promise((resolve,reject)=>{
-    const req=indexedDB.open('operating-modes-828d',1);
+    const req=indexedDB.open(MODES_DB_NAME,MODES_DB_VERSION);
     req.onupgradeneeded=()=>{
       const db=req.result;
-      if(!db.objectStoreNames.contains('records'))db.createObjectStore('records',{keyPath:'id'});
+      if(!db.objectStoreNames.contains(MODES_STORE))db.createObjectStore(MODES_STORE,{keyPath:'id'});
     };
     req.onsuccess=()=>resolve(req.result);
     req.onerror=()=>reject(req.error);
@@ -23,21 +20,21 @@
   async function dbAll(){
     const db=await dbp;
     return new Promise((res,rej)=>{
-      const r=db.transaction('records').objectStore('records').getAll();
+      const r=db.transaction('records').objectStore(MODES_STORE).getAll();
       r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
     });
   }
   async function dbPut(value){
     const db=await dbp;
     return new Promise((res,rej)=>{
-      const r=db.transaction('records','readwrite').objectStore('records').put(value);
+      const r=db.transaction('records','readwrite').objectStore(MODES_STORE).put(value);
       r.onsuccess=()=>res(value);r.onerror=()=>rej(r.error);
     });
   }
   async function dbDelete(id){
     const db=await dbp;
     return new Promise((res,rej)=>{
-      const r=db.transaction('records','readwrite').objectStore('records').delete(id);
+      const r=db.transaction('records','readwrite').objectStore(MODES_STORE).delete(id);
       r.onsuccess=()=>res();r.onerror=()=>rej(r.error);
     });
   }
