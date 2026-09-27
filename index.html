@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="./modules/copilot.css">
   <link rel="stylesheet" href="./modules/codes.css">
   <link rel="stylesheet" href="./modules/profile.css">
+  <link rel="stylesheet" href="./modules/tools.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -595,8 +596,32 @@
       </section>
 
       <section class="view simple-view" data-view="tools">
-        <div class="simple-title"><p class="eyebrow">ИНСТРУМЕНТ</p><h2>Мой шкаф</h2><p>Общий инструментальный модуль будет связан с режимами, геометрией и CNC Copilot.</p></div>
-        <div class="empty-panel"><span>◇</span><strong>Каркас готов</strong><p>Инструментальная база подключится отдельным этапом.</p></div>
+        <div class="tools-workspace">
+          <section class="tools-hero">
+            <small>ОБЩАЯ ИНСТРУМЕНТАЛЬНАЯ БАЗА</small>
+            <h2>Мой шкаф</h2>
+            <p>Каталог Copilot + твои реальные пластины и державки. Локальный шкаф хранится на устройстве под исходным ключом <b>cncFullToolsV2</b>.</p>
+            <div class="tools-hero-stats">
+              <div><span>Всего карточек</span><strong id="toolsCount">0</strong></div>
+              <div><span>Мой шкаф</span><strong id="toolsLocalCount">0</strong></div>
+              <div><span>Пластин в наличии</span><strong id="toolsQty">0</strong></div>
+            </div>
+          </section>
+          <div class="tools-toolbar">
+            <label class="tools-search"><span>⌕</span><input id="toolsSearch" type="search" placeholder="Пластина, державка, grade, ячейка…" autocomplete="off"></label>
+            <button class="tools-add" id="toolsAdd" type="button">＋ Добавить</button>
+          </div>
+          <div class="tools-filters">
+            <button class="tools-filter is-active" data-tools-iso="all" type="button">Все</button>
+            <button class="tools-filter" data-tools-iso="P" type="button">ISO P</button>
+            <button class="tools-filter" data-tools-iso="M" type="button">ISO M</button>
+            <button class="tools-filter" data-tools-iso="K" type="button">ISO K</button>
+            <button class="tools-filter" data-tools-iso="N" type="button">ISO N</button>
+            <button class="tools-filter" data-tools-iso="S" type="button">ISO S</button>
+            <button class="tools-filter" data-tools-iso="H" type="button">ISO H</button>
+          </div>
+          <div class="tools-grid" id="toolsGrid"></div>
+        </div>
       </section>
 
       <section class="view simple-view" data-view="projects">
@@ -673,6 +698,37 @@
     </nav>
   </div>
 
+  <dialog class="tool-dialog" id="toolDialog">
+    <form class="tool-dialog-inner" id="toolForm">
+      <div class="tool-dialog-head">
+        <div><small>МОЙ ШКАФ</small><h3 id="toolFormTitle">Добавить инструмент</h3></div>
+        <button class="tool-dialog-close" id="toolDialogClose" type="button">×</button>
+      </div>
+      <div class="tool-form-grid">
+        <label class="tool-field"><span>Державка</span><input id="toolHolder" placeholder="PCLNR 2525M12"></label>
+        <label class="tool-field"><span>Пластина</span><input id="toolInsert" required placeholder="WNMG 080408"></label>
+        <label class="tool-field"><span>Grade</span><input id="toolGrade" placeholder="HAPC9030"></label>
+        <label class="tool-field"><span>Стружколом</span><input id="toolBreaker" placeholder="PM / MF"></label>
+        <label class="tool-field"><span>Радиус R, мм</span><input id="toolNose" inputmode="decimal" placeholder="0.8"></label>
+        <label class="tool-field"><span>Количество</span><input id="toolQty" inputmode="numeric" value="1"></label>
+        <label class="tool-field"><span>Ячейка</span><input id="toolLocation" placeholder="A4 / B2"></label>
+        <label class="tool-field"><span>ISO через запятую</span><input id="toolIso" placeholder="M,P"></label>
+        <label class="tool-field wide"><span>Операции через запятую</span><input id="toolOps" placeholder="face,od,bore"></label>
+        <label class="tool-field"><span>Vc min</span><input id="toolVcMin" inputmode="decimal"></label>
+        <label class="tool-field"><span>Vc max</span><input id="toolVcMax" inputmode="decimal"></label>
+        <label class="tool-field"><span>f min</span><input id="toolFeedMin" inputmode="decimal"></label>
+        <label class="tool-field"><span>f max</span><input id="toolFeedMax" inputmode="decimal"></label>
+        <label class="tool-field"><span>ap min</span><input id="toolApMin" inputmode="decimal"></label>
+        <label class="tool-field"><span>ap max</span><input id="toolApMax" inputmode="decimal"></label>
+        <label class="tool-field wide"><span>Фото</span><input id="toolPhoto" type="file" accept="image/*"></label>
+      </div>
+      <div class="tool-dialog-actions">
+        <button class="tool-delete" id="toolDelete" type="button" hidden>Удалить</button>
+        <button class="tool-save" type="submit">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog class="modes-dialog" id="modesRecordDialog">
     <form class="modes-dialog-inner" id="modesRecordForm">
       <div class="modes-dialog-head">
@@ -726,5 +782,6 @@
   <script type="module" src="./modules/copilot.js"></script>
   <script type="module" src="./modules/codes.js"></script>
   <script src="./modules/profile.js" defer></script>
+  <script src="./modules/tools.js" defer></script>
 </body>
 </html>
