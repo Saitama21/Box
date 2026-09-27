@@ -41,8 +41,10 @@ test('app shell reserves safe-area only as content space',()=>{
 test('native Box and Modes modules are wired into root shell',()=>{
   assert.match(index,/data-view="box"/);
   assert.match(index,/data-view="modes"/);
+  assert.match(index,/data-view="cutcalc"/);
   assert.match(index,/modules\/box\.js/);
   assert.match(index,/modules\/modes\.js/);
+  assert.match(index,/modules\/cutcalc\.js/);
 });
 
 test('approved material cards are real WebP files and cached offline',()=>{
@@ -56,7 +58,18 @@ test('approved material cards are real WebP files and cached offline',()=>{
 });
 
 test('critical native modules are part of offline app shell',()=>{
-  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js']){
+  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs']){
     assert.ok(sw.includes(path),`Missing offline cache entry: ${path}`);
+  }
+});
+
+
+test('CutCalc approved WebP graphics are real files and cached offline',()=>{
+  for(const name of ['result-rod.webp','rod-brass.webp','rod-steel.webp']){
+    const path='assets/cutcalc/'+name;
+    const data=fs.readFileSync(path);
+    assert.equal(data.subarray(0,4).toString('ascii'),'RIFF');
+    assert.equal(data.subarray(8,12).toString('ascii'),'WEBP');
+    assert.ok(sw.includes('./'+path),`Service worker does not cache ${path}`);
   }
 });
