@@ -1,5 +1,5 @@
 import { MODES_DB_NAME, MODES_DB_VERSION, MODES_STORE, MODES_MATERIALS } from './modes-data.mjs';
-import { updateWorkspace } from './workspace-store.mjs';
+import { updateWorkspace, loadWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -170,12 +170,24 @@ import { updateWorkspace } from './workspace-store.mjs';
     for(const r of data.records)await dbPut(r);state.records=(await dbAll()).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));renderDeck();renderSearch();$('modesMenuDialog').close();
   }
 
+  function hydrateWorkspace(){
+    const w=loadWorkspace();
+    const active=w.mode||null;
+    if(active?.materialId){
+      openMaterial(active.materialId,active.id||null);
+      return;
+    }
+    const materialId=w.material?.id||null;
+    if(materialId&&MATERIALS.some(m=>m.id===materialId))openMaterial(materialId);
+  }
+
   function bind(){
     document.querySelectorAll('[data-modes-nav]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.modesNav==='home'){renderDeck();setView('home')}else{renderSearch();setView('search')}}));
     $('modesAdd').onclick=()=>openForm();$('modesBackMaterial').onclick=()=>{renderDeck();setView('home')};$('modesPrev').onclick=()=>move(-1);$('modesNext').onclick=()=>move(1);$('modesEmptyAdd').onclick=()=>openForm();$('modesEdit').onclick=()=>openForm(currentRecord());
     $('modesRecordForm').addEventListener('submit',saveForm);$('modesRecordClose').onclick=()=>$('modesRecordDialog').close();if($('modesUse'))$('modesUse').onclick=()=>useRecordInWorkspace();$('modesDelete').onclick=removeCurrent;$('modesSearchInput').addEventListener('input',renderSearch);$('modesClearSearch').onclick=()=>{$('modesSearchInput').value='';renderSearch()};
     $('modesNote').onclick=()=>{const r=currentRecord();if(!r?.note)return;$('modesNoteTitle').textContent=r.title||'Заметка';$('modesNoteFull').textContent=r.note;$('modesNoteDialog').showModal()};$('modesNoteClose').onclick=()=>$('modesNoteDialog').close();$('modesMenuClose').onclick=()=>$('modesMenuDialog').close();
     $('modesMenu').onclick=()=>$('modesMenuDialog').showModal();$('modesExport').onclick=exportData;$('modesImport').onchange=async e=>{try{if(e.target.files[0])await importData(e.target.files[0])}catch{alert('Не удалось импортировать файл')}};
+    window.addEventListener('cnc-module-opened',event=>{if(event.detail?.id==='modes')hydrateWorkspace()});
   }
 
   async function start(){
