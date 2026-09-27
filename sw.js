@@ -1,4 +1,4 @@
-const VERSION = '1.0.2';
+const VERSION = '1.1.0';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -38,6 +38,9 @@ const APP_SHELL = [
   './modules/workspace-store.mjs',
   './modules/workflow.css',
   './modules/workflow.js',
+  './modules/result-core.mjs',
+  './modules/result.css',
+  './modules/result.js',
   './assets/cutcalc/result-rod.webp',
   './assets/cutcalc/rod-brass.webp',
   './assets/cutcalc/rod-steel.webp',
