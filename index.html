@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./modules/box.css">
   <link rel="stylesheet" href="./modules/modes.css">
+  <link rel="stylesheet" href="./modules/cutcalc.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -218,6 +219,92 @@
         </section>
       </section>
 
+      <section class="view cutcalc-view" data-view="cutcalc">
+        <div class="cutcalc-head">
+          <div class="cutcalc-head-left">
+            <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
+            <div class="cutcalc-head-copy"><small>ЦЕХОВОЙ КАЛЬКУЛЯТОР</small><strong>CutCalc CNC</strong></div>
+          </div>
+          <div class="cutcalc-tabs">
+            <button class="is-active" data-cut-tab="calc" type="button">Расчёт</button>
+            <button data-cut-tab="history" type="button">История</button>
+          </div>
+        </div>
+
+        <section class="cutcalc-screen is-active" data-cut-screen="calc">
+          <div class="cutcalc-utility">
+            <div class="cutcalc-status" id="cutOfflineState"><i></i><span>Готов к работе</span></div>
+            <button class="cutcalc-clear" id="cutClearAll" type="button">Очистить всё</button>
+          </div>
+
+          <div class="cutcalc-layout">
+            <div class="cutcalc-inputs">
+              <section class="cutcalc-panel cutcalc-stock">
+                <p class="cutcalc-kicker">ЗАГОТОВКА</p>
+                <label class="cutcalc-field"><span>Материал</span><input id="cutMaterial" list="cutMaterials" type="text" placeholder="AISI 304" autocomplete="off"><datalist id="cutMaterials"><option value="AISI 304"></option><option value="AISI 316"></option><option value="Сталь 20"></option><option value="Сталь 45"></option><option value="Полиамид PA6"></option><option value="PE 1000"></option><option value="Латунь Л63"></option><option value="Алюминий АД31"></option><option value="Титан ВТ6"></option></datalist></label>
+                <div class="cutcalc-cols2">
+                  <label class="cutcalc-field"><span>Диаметр</span><div class="cutcalc-unit"><input id="cutDiameter" type="number" min="0" step="0.1" inputmode="decimal" placeholder="—"><b>мм</b></div></label>
+                  <label class="cutcalc-field"><span>Длина детали *</span><div class="cutcalc-unit"><input id="cutPartLength" type="number" min="0.1" step="0.1" inputmode="decimal" placeholder="—"><b>мм</b></div></label>
+                </div>
+                <label class="cutcalc-field"><span>Количество *</span><div class="cutcalc-unit"><input id="cutQuantity" type="number" min="1" step="1" inputmode="numeric" placeholder="—"><b>шт</b></div></label>
+              </section>
+
+              <section class="cutcalc-panel">
+                <p class="cutcalc-kicker">ОБРАБОТКА</p>
+                <div class="cutcalc-cols3">
+                  <label class="cutcalc-field"><span>Отрезной рез</span><div class="cutcalc-unit"><input id="cutKerf" type="number" min="0" step="0.1" inputmode="decimal" placeholder="—"><b>мм</b></div></label>
+                  <label class="cutcalc-field"><span>Торцовка A</span><div class="cutcalc-unit"><input id="cutFaceA" type="number" min="0" step="0.1" inputmode="decimal" placeholder="—"><b>мм</b></div></label>
+                  <label class="cutcalc-field"><span>Торцовка B</span><div class="cutcalc-unit"><input id="cutFaceB" type="number" min="0" step="0.1" inputmode="decimal" placeholder="—"><b>мм</b></div></label>
+                </div>
+              </section>
+
+              <details class="cutcalc-details" id="cutBarDetails">
+                <summary><strong>Расчёт по пруткам</strong><span>⌄</span></summary>
+                <div class="cutcalc-details-body">
+                  <div class="cutcalc-cols2">
+                    <label class="cutcalc-field"><span>Длина прутка</span><div class="cutcalc-unit"><input id="cutStockLength" type="number" min="1" step="1" inputmode="decimal" placeholder="—"><b>мм</b></div></label>
+                    <label class="cutcalc-field"><span>Первая торцовка</span><div class="cutcalc-unit"><input id="cutStockFace" type="number" min="0" step="0.1" inputmode="decimal" placeholder="—"><b>мм</b></div></label>
+                  </div>
+                  <div class="cutcalc-cols2">
+                    <label class="cutcalc-field"><span>Запас деталей</span><div class="cutcalc-unit"><input id="cutReservePct" type="number" min="0" max="100" step="0.5" inputmode="decimal" placeholder="—"><b>%</b></div></label>
+                    <div class="cutcalc-grip"><span>Мин. зажим</span><b id="cutMinGripValue">46 мм</b></div>
+                  </div>
+                  <div class="cutcalc-bar-stats">
+                    <div><span>Деталей / пруток</span><strong id="cutPartsPerBar">—</strong></div>
+                    <div><span>Прутков</span><strong id="cutBarsCount">—</strong></div>
+                    <div><span>Хвост</span><strong id="cutGripTail">—</strong></div>
+                    <div><span>Остаток</span><strong id="cutRemainderValue">—</strong></div>
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <section class="cutcalc-result" aria-live="polite">
+              <div class="cutcalc-result-top">
+                <div class="cutcalc-result-copy">
+                  <small>НУЖНО МАТЕРИАЛА</small>
+                  <div class="cutcalc-result-value"><strong id="cutPurchaseMeters">—</strong><span>м</span></div>
+                  <p class="cutcalc-hint" id="cutPurchaseHint">Заполни длину детали и количество</p>
+                </div>
+                <img src="./assets/cutcalc/result-rod.webp" class="cutcalc-result-art" alt="Пруток из нержавеющей стали">
+              </div>
+              <div class="cutcalc-metrics">
+                <div><span>Расход / деталь</span><strong id="cutCycleLength">—</strong></div>
+                <div><span>Чистый размер</span><strong id="cutNetLength">—</strong></div>
+                <div><span>Потери</span><strong id="cutTechLoss">—</strong></div>
+              </div>
+              <div class="cutcalc-warning" id="cutWarning" hidden></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="cutcalc-screen" data-cut-screen="history">
+          <div class="cutcalc-history-head"><h2>История</h2><button class="cutcalc-clear" id="cutClearHistory" type="button">Очистить</button></div>
+          <div class="cutcalc-history-list" id="cutHistoryList"></div>
+          <div class="cutcalc-empty" id="cutHistoryEmpty"><strong>Пока пусто</strong><p>Расчёты появятся здесь после перехода в историю и останутся локально на устройстве.</p></div>
+        </section>
+      </section>
+
       <section class="view box-view" data-view="box">
         <div class="box-module-head">
           <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
@@ -378,5 +465,6 @@
   <script src="./app.js" defer></script>
   <script type="module" src="./modules/box.js"></script>
   <script src="./modules/modes.js" defer></script>
+  <script type="module" src="./modules/cutcalc.js"></script>
 </body>
 </html>
