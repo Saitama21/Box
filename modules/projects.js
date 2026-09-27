@@ -209,6 +209,9 @@ import { MODES_DB_NAME, MODES_DB_VERSION, MODES_STORE } from './modes-data.mjs';
   window.addEventListener('cnc-module-opened',event=>{
     if(event.detail?.id)render();
   });
+  window.addEventListener('cnc-route-opened',event=>{
+    if(event.detail?.route==='projects')render();
+  });
   window.addEventListener('storage',render);
 
   render();
