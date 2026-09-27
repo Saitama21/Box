@@ -1,4 +1,4 @@
-const VERSION = '1.0.1';
+const VERSION = '1.0.2';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -69,43 +69,59 @@ self.addEventListener('activate', event => {
   );
 });
 
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+async function freshFirst(request, fallback) {
+  try {
+    const networkRequest = new Request(request, { cache: 'reload' });
+    const response = await fetch(networkRequest);
+    if (response && response.ok) {
+      const cache = await caches.open(CACHE);
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    const cached = await caches.match(request, { ignoreSearch: true });
+    if (cached) return cached;
+    if (fallback) {
+      const local = await caches.match(fallback, { ignoreSearch: true });
+      if (local) return local;
+    }
+    throw new Error('Offline asset unavailable');
+  }
+}
 
-  const url = new URL(event.request.url);
+async function cacheFirst(request) {
+  const cached = await caches.match(request, { ignoreSearch: true });
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (response && response.ok) {
+    const cache = await caches.open(CACHE);
+    await cache.put(request, response.clone());
+  }
+  return response;
+}
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          if (response.ok && url.pathname.endsWith('/Box/')) {
-            const copy = response.clone();
-            caches.open(CACHE).then(cache => cache.put('./index.html', copy));
-          }
-          return response;
-        })
-        .catch(async () => {
-          const exact = await caches.match(event.request);
-          return exact || caches.match('./index.html');
-        })
-    );
+  if (request.mode === 'navigate') {
+    event.respondWith(freshFirst(request, './index.html'));
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      const network = fetch(event.request)
-        .then(response => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE).then(cache => cache.put(event.request, copy));
-          }
-          return response;
-        })
-        .catch(() => cached);
+  const isCode =
+    request.destination === 'script' ||
+    request.destination === 'style' ||
+    request.destination === 'manifest' ||
+    /\.(?:js|mjs|css|html|webmanifest)$/i.test(url.pathname);
 
-      return cached || network;
-    })
-  );
+  if (isCode) {
+    event.respondWith(freshFirst(request));
+    return;
+  }
+
+  event.respondWith(cacheFirst(request));
 });
