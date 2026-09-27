@@ -20,6 +20,7 @@
   function render(p=load()){
     $('profileMachineName').value=p.name||'';$('profileControl').value=p.control||'';$('profileMaxRpm').value=p.maxRpm||4000;$('profilePower').value=p.spindleKw||17;$('profileEfficiency').value=p.efficiency??.85;$('profileSetupRpm').value=p.setupMaxRpm||'';$('profileSpindle').value=p.spindle||'A2-6';$('profileBore').value=p.bore||61;$('profileTurret').value=p.turret||'';$('profileAxes').value=p.axes||'';$('profileCylinderModel').value=p.chuckCylinder?.model||'BK-1552';$('profileCylinderRpm').value=p.chuckCylinder?.maxRpm||6000;$('profileMotorModel').value=p.motor?.model||'1PH8137-1DD02-0CA1';$('profileMotorRpm').value=p.motor?.maxRpm||8000;
     $('profileHeroName').textContent=p.name||fallback.name;$('profileHeroControl').textContent=p.control||fallback.control;
+    if($('homeMachineName'))$('homeMachineName').textContent=p.name||fallback.name;if($('homeMachineControl'))$('homeMachineControl').textContent=p.control||fallback.control;if($('homeMachineRpm'))$('homeMachineRpm').textContent=(p.maxRpm||4000)+' rpm';if($('homeMachineTurret'))$('homeMachineTurret').textContent=String(p.turret||'15 позиций').replace('иций','.') ;if($('homeMachineAxes'))$('homeMachineAxes').textContent=p.axes||'X / Z / Y / C';
     const lim=limiter(p);$('profileEffectiveLimit').textContent=Math.round(lim[1]);$('profileLimitText').textContent='G96 / LIMS будет ограничен: '+lim[0]+' · '+Math.round(lim[1])+' rpm';
   }
   function exportProfile(){
