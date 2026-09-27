@@ -1,4 +1,5 @@
 import { MODES_DB_NAME, MODES_DB_VERSION, MODES_STORE, MODES_MATERIALS } from './modes-data.mjs';
+import { updateWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -118,7 +119,29 @@ import { MODES_DB_NAME, MODES_DB_VERSION, MODES_STORE, MODES_MATERIALS } from '.
     const old=state.editingId?state.records.find(r=>r.id===state.editingId):null;
     let image=old?.image||'';const file=$('modesFormPhoto').files[0];if(file)image=await fileData(file);
     const rec={id:old?.id||uid(),materialId:$('modesFormMaterial').value,title:$('modesFormName').value.trim(),dia:$('modesFormDia').value.trim(),operation:$('modesFormOperation').value.trim(),rpm:$('modesFormRpm').value.trim(),feed:$('modesFormFeed').value.trim(),depth:$('modesFormDepth').value.trim(),tool:$('modesFormTool').value.trim(),note:$('modesFormNote').value.trim(),image,createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
-    await dbPut(rec);state.records=(await dbAll()).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));$('modesRecordDialog').close();renderDeck();openMaterial(rec.materialId,rec.id);
+    await dbPut(rec);state.records=(await dbAll()).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));$('modesRecordDialog').close();renderDeck();openMaterial(rec.materialId,rec.id);useRecordInWorkspace(rec);
+  }
+
+  function useRecordInWorkspace(record=currentRecord()){
+    if(!record)return;
+    const m=material(record.materialId);
+    updateWorkspace(w=>({
+      title:w.title==='Новая деталь'&&record.title?record.title:w.title,
+      material:{id:m.id,label:m.title,title:m.title,subtitle:m.subtitle},
+      stock:record.dia?{...(w.stock||{}),diameter:Number(String(record.dia).replace(',','.'))||record.dia}:w.stock,
+      mode:{
+        id:record.id,
+        title:record.title||'Проверенный режим',
+        materialId:record.materialId,
+        operation:record.operation||'',
+        rpm:record.rpm||'',
+        feed:record.feed||'',
+        depth:record.depth||'',
+        tool:record.tool||'',
+        note:record.note||''
+      }
+    }),{source:'modes'});
+    const b=$('modesUse');if(b){const old=b.textContent;b.textContent='В работе ✓';setTimeout(()=>b.textContent=old,1300)}
   }
 
   async function removeCurrent(){
@@ -150,7 +173,7 @@ import { MODES_DB_NAME, MODES_DB_VERSION, MODES_STORE, MODES_MATERIALS } from '.
   function bind(){
     document.querySelectorAll('[data-modes-nav]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.modesNav==='home'){renderDeck();setView('home')}else{renderSearch();setView('search')}}));
     $('modesAdd').onclick=()=>openForm();$('modesBackMaterial').onclick=()=>{renderDeck();setView('home')};$('modesPrev').onclick=()=>move(-1);$('modesNext').onclick=()=>move(1);$('modesEmptyAdd').onclick=()=>openForm();$('modesEdit').onclick=()=>openForm(currentRecord());
-    $('modesRecordForm').addEventListener('submit',saveForm);$('modesRecordClose').onclick=()=>$('modesRecordDialog').close();$('modesDelete').onclick=removeCurrent;$('modesSearchInput').addEventListener('input',renderSearch);$('modesClearSearch').onclick=()=>{$('modesSearchInput').value='';renderSearch()};
+    $('modesRecordForm').addEventListener('submit',saveForm);$('modesRecordClose').onclick=()=>$('modesRecordDialog').close();if($('modesUse'))$('modesUse').onclick=()=>useRecordInWorkspace();$('modesDelete').onclick=removeCurrent;$('modesSearchInput').addEventListener('input',renderSearch);$('modesClearSearch').onclick=()=>{$('modesSearchInput').value='';renderSearch()};
     $('modesNote').onclick=()=>{const r=currentRecord();if(!r?.note)return;$('modesNoteTitle').textContent=r.title||'Заметка';$('modesNoteFull').textContent=r.note;$('modesNoteDialog').showModal()};$('modesNoteClose').onclick=()=>$('modesNoteDialog').close();$('modesMenuClose').onclick=()=>$('modesMenuDialog').close();
     $('modesMenu').onclick=()=>$('modesMenuDialog').showModal();$('modesExport').onclick=exportData;$('modesImport').onchange=async e=>{try{if(e.target.files[0])await importData(e.target.files[0])}catch{alert('Не удалось импортировать файл')}};
   }
