@@ -36,7 +36,8 @@
 - CutCalc history: `cutcalc.history.v3`;
 - Geometry projects: `cnc-geometry-projects-v1`;
 - Copilot route: `cnc-suite.copilot.route-v1`;
-- Active workspace: `cnc-suite.workspace-v1`.
+- Active workspace: `cnc-suite.workspace-v1`;
+- Saved workspace library: `cnc-suite.saved-workspaces-v1`.
 
 ## UI contract — Bottom Dock
 
@@ -68,3 +69,8 @@ node --test tests/*.test.mjs
 ```
 
 Тесты защищают расчётные ядра, dock-контракт, offline app shell, реестр модулей, профиль станка и совместимость локальных данных.
+
+
+## Saved Projects
+
+Projects хранит отдельные снимки активного Workflow. При открытии сохранённой детали активный workspace восстанавливается, а Geometry, CutCalc, Box, CNC Reference, инструмент и CNC Co-Pilot подхватывают данные этого проекта при открытии соответствующего раздела.
