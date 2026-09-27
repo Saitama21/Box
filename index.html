@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="./modules/box.css">
   <link rel="stylesheet" href="./modules/modes.css">
   <link rel="stylesheet" href="./modules/cutcalc.css">
+  <link rel="stylesheet" href="./modules/geometry.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -216,6 +217,89 @@
         <section class="modes-screen" data-modes-screen="search">
           <div class="modes-search-box"><span>⌕</span><input id="modesSearchInput" type="search" placeholder="Деталь, материал, инструмент…" autocomplete="off"><button id="modesClearSearch" type="button" aria-label="Очистить">×</button></div>
           <div class="modes-search-results" id="modesSearchResults"></div>
+        </section>
+      </section>
+
+      <section class="view geometry-view" data-view="geometry">
+        <div class="geometry-head">
+          <div class="geometry-head-left">
+            <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
+            <div class="geometry-head-copy"><small>CNC GEOMETRY · FULL OFFLINE</small><strong>Геометрия и координаты</strong></div>
+          </div>
+          <div class="geometry-tabs">
+            <button class="is-active" data-geometry-tab="home" type="button">Расчёты</button>
+            <button data-geometry-tab="projects" type="button">Проекты</button>
+          </div>
+        </div>
+
+        <section class="geometry-screen is-active" data-geometry-screen="home">
+          <section class="geometry-hero">
+            <small>CNC · GEOMETRY · SINUMERIK</small>
+            <h2>Геометрия, координаты<br>и режимы.</h2>
+            <p>12 расчётных модулей из CNC Geometry: шар → 4 грани, ось C, PCD, лепестки, лыски, многоугольники, пазы, отверстия, резьба, дуги, линейные массивы и фрезерные режимы.</p>
+            <div class="geometry-quick">
+              <button id="geometryQuickSphere" type="button">◉ Шар → 4 грани</button>
+              <button id="geometryQuickLobes" type="button">✿ Лепестки</button>
+              <button id="geometryQuickPcd" type="button">◎ PCD</button>
+            </div>
+          </section>
+          <div class="geometry-section-head"><div><small>РАСЧЁТНЫЕ МОДУЛИ</small><strong>Инженерная геометрия</strong></div><span>12 модулей</span></div>
+          <div class="geometry-grid" id="geometryCards"></div>
+        </section>
+
+        <section class="geometry-screen" data-geometry-screen="calc">
+          <div class="geometry-back-row">
+            <button class="geometry-back" id="geometryBackCalc" type="button"><span>‹</span> Все расчёты</button>
+            <small class="geometry-calc-tag" id="geometryCalcTag">X/Z/C</small>
+          </div>
+          <form class="geometry-form-card" id="geometryForm">
+            <div class="geometry-form-title"><small>ИСХОДНЫЕ ДАННЫЕ</small><strong id="geometryFormTitle">Расчёт</strong><p id="geometryFormDesc"></p></div>
+            <div class="geometry-form-grid" id="geometryFormGrid"></div>
+            <div class="geometry-validation">Проверка геометрии включена. Если размеры противоречат друг другу или инструмент физически не подходит, расчёт будет остановлен с пояснением.</div>
+            <div class="geometry-form-footer"><button class="geometry-primary" type="submit">▦ Рассчитать</button></div>
+          </form>
+        </section>
+
+        <section class="geometry-screen" data-geometry-screen="result">
+          <div class="geometry-back-row">
+            <button class="geometry-back" id="geometryBackResult" type="button"><span>‹</span> Исходные данные</button>
+            <small class="geometry-calc-tag" id="geometryResultTag">РЕЗУЛЬТАТ</small>
+          </div>
+          <section class="geometry-result-hero" id="geometryResultHero"></section>
+          <div id="geometryWarnings"></div>
+          <div class="geometry-result-grid">
+            <section class="geometry-result-card">
+              <div class="geometry-result-title"><strong>Результат</strong><span>расчёт</span></div>
+              <div class="geometry-summary" id="geometrySummary"></div>
+            </section>
+            <section class="geometry-result-card">
+              <div class="geometry-result-title"><strong>Техническая схема</strong><span>SVG · offline</span></div>
+              <div class="geometry-diagram" id="geometryDiagram"></div>
+            </section>
+            <section class="geometry-result-card wide">
+              <div class="geometry-result-title"><strong>Координаты / шаг</strong><span>таблица</span></div>
+              <div id="geometryTables"></div>
+            </section>
+            <section class="geometry-result-card wide">
+              <div class="geometry-result-title"><strong>Для стойки</strong><span>копируемые данные</span></div>
+              <pre class="geometry-code" id="geometryCode"></pre>
+              <div class="geometry-actions"><button class="geometry-action" id="geometryCopy" type="button">⧉ Копировать</button></div>
+            </section>
+            <section class="geometry-result-card wide">
+              <div class="geometry-result-title"><strong>Действия</strong><span>локально</span></div>
+              <div class="geometry-actions">
+                <button class="geometry-action primary" id="geometrySave" type="button">＋ Сохранить проект</button>
+                <button class="geometry-action" id="geometryPng" type="button">▧ PNG карточка</button>
+                <button class="geometry-action" id="geometryPrint" type="button">PDF / печать</button>
+                <button class="geometry-action" id="geometryNew" type="button">＋ Новый расчёт</button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="geometry-screen" data-geometry-screen="projects">
+          <div class="geometry-section-head"><div><small>LOCAL STORAGE</small><strong>Сохранённые расчёты</strong></div><span>cnc-geometry-projects-v1</span></div>
+          <div class="geometry-project-list" id="geometryProjects"></div>
         </section>
       </section>
 
@@ -466,5 +550,6 @@
   <script type="module" src="./modules/box.js"></script>
   <script src="./modules/modes.js" defer></script>
   <script type="module" src="./modules/cutcalc.js"></script>
+  <script type="module" src="./modules/geometry.js"></script>
 </body>
 </html>
