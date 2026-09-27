@@ -1,4 +1,4 @@
-name: Deploy Box PWA to GitHub Pages
+name: Deploy CNC Copilot to GitHub Pages
 
 on:
   push:
