@@ -64,7 +64,7 @@ test('approved material cards are real WebP files and cached offline',()=>{
 });
 
 test('critical native modules are part of offline app shell',()=>{
-  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs']){
+  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs','./modules/profile.css','./modules/profile.js']){
     assert.ok(sw.includes(path),`Missing offline cache entry: ${path}`);
   }
 });
@@ -78,4 +78,11 @@ test('CutCalc approved WebP graphics are real files and cached offline',()=>{
     assert.equal(data.subarray(8,12).toString('ascii'),'WEBP');
     assert.ok(sw.includes('./'+path),`Service worker does not cache ${path}`);
   }
+});
+
+
+test('shared machine profile is wired to unified shell',()=>{
+  assert.match(index,/id="profileSave"/);
+  assert.match(index,/id="homeMachineName"/);
+  assert.match(index,/modules\/profile\.js/);
 });
