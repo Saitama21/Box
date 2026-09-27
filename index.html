@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="./modules/profile.css">
   <link rel="stylesheet" href="./modules/tools.css">
   <link rel="stylesheet" href="./modules/projects.css">
+  <link rel="stylesheet" href="./modules/workflow.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -78,6 +79,18 @@
               <div class="machine-tool"></div>
               <div class="machine-rail"></div>
             </div>
+          </div>
+        </section>
+
+        <section class="workflow-launch">
+          <div class="workflow-launch-copy">
+            <small>СКВОЗНОЙ WORKFLOW</small>
+            <strong>Текущая деталь</strong>
+            <span id="homeWorkflowText">Начни с геометрии или материала</span>
+          </div>
+          <div class="workflow-launch-progress">
+            <div class="workflow-launch-ring" id="homeWorkflowRing"><b id="homeWorkflowPercent">0%</b></div>
+            <button type="button" data-route-button="workflow">Открыть процесс ›</button>
           </div>
         </section>
 
@@ -134,6 +147,69 @@
           <div class="summary-head"><span>МОЙ СТАНОК</span><i>● READY</i></div>
           <div class="summary-main"><div><strong id="homeMachineName">Tengyue CK52PT-Y</strong><small id="homeMachineControl">SINUMERIK 828D · ShopTurn</small></div><button type="button" data-route-button="profile">Настроить ›</button></div>
           <div class="summary-specs"><span><small>Шпиндель</small><b id="homeMachineRpm">4000 rpm</b></span><span><small>Револьвер</small><b id="homeMachineTurret">15 поз.</b></span><span><small>Оси</small><b id="homeMachineAxes">X / Z / Y / C</b></span></div>
+        </section>
+      </section>
+
+      <section class="view workflow-view" data-view="workflow">
+        <div class="workflow-top">
+          <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
+          <div class="workflow-top-actions">
+            <button id="workflowCopy" type="button">⧉ Сводка</button>
+            <button class="danger" id="workflowNew" type="button">Новая деталь</button>
+          </div>
+        </div>
+
+        <section class="workflow-hero">
+          <small>ТЕКУЩИЙ РАБОЧИЙ ПРОЦЕСС</small>
+          <div class="workflow-title-row">
+            <input class="workflow-title-input" id="workflowTitle" value="Новая деталь" aria-label="Название текущей детали">
+            <span class="workflow-state-pill"><i></i>LOCAL · OFFLINE</span>
+          </div>
+          <div class="workflow-machine" id="workflowMachine">Tengyue CK52PT-Y · SINUMERIK 828D</div>
+          <div class="workflow-progress-row">
+            <div class="workflow-progress-copy"><span>ГОТОВНОСТЬ</span><strong id="workflowDoneText">0 из 7 этапов</strong></div>
+            <b class="workflow-percent" id="workflowPercent">0%</b>
+            <div class="workflow-progress-track"><i id="workflowTrack"></i></div>
+          </div>
+        </section>
+
+        <section class="workflow-grid">
+          <button class="workflow-step" data-step="geometry" data-workflow-target="geometry" type="button">
+            <span class="workflow-step-index">01</span><span class="workflow-step-copy"><small>ГЕОМЕТРИЯ</small><strong>Размеры и координаты</strong><span data-workflow-status>Геометрия не выбрана</span></span><span class="workflow-step-arrow">›</span>
+          </button>
+          <button class="workflow-step" data-step="material" data-workflow-target="modes" type="button">
+            <span class="workflow-step-index">02</span><span class="workflow-step-copy"><small>МАТЕРИАЛ · РЕЖИМ</small><strong>Материал и проверенный режим</strong><span data-workflow-status>Материал не выбран</span></span><span class="workflow-step-arrow">›</span>
+          </button>
+          <button class="workflow-step" data-step="cutcalc" data-workflow-target="cutcalc" type="button">
+            <span class="workflow-step-index">03</span><span class="workflow-step-copy"><small>CUT CALC</small><strong>Заготовка и партия</strong><span data-workflow-status>Расчёт не сохранён</span></span><span class="workflow-step-arrow">›</span>
+          </button>
+          <button class="workflow-step" data-step="tool" data-workflow-target="tools" data-workflow-type="route" type="button">
+            <span class="workflow-step-index">04</span><span class="workflow-step-copy"><small>ИНСТРУМЕНТ</small><strong>Пластина и державка</strong><span data-workflow-status>Инструмент не выбран</span></span><span class="workflow-step-arrow">›</span>
+          </button>
+          <button class="workflow-step" data-step="box" data-workflow-target="box" type="button">
+            <span class="workflow-step-index">05</span><span class="workflow-step-copy"><small>BOX</small><strong>Укладка и количество</strong><span data-workflow-status>Укладка не рассчитана</span></span><span class="workflow-step-arrow">›</span>
+          </button>
+          <button class="workflow-step" data-step="copilot" data-workflow-target="copilot" type="button">
+            <span class="workflow-step-index">06</span><span class="workflow-step-copy"><small>CNC COPILOT</small><strong>Маршрут обработки</strong><span data-workflow-status>Маршрут не собран</span></span><span class="workflow-step-arrow">›</span>
+          </button>
+          <button class="workflow-step" data-step="result" data-workflow-target="workflow" data-workflow-type="route" type="button">
+            <span class="workflow-step-index">07</span><span class="workflow-step-copy"><small>РЕЗУЛЬТАТ</small><strong>Итоговый техпроцесс</strong><span data-workflow-status>Финальный расчёт не выполнен</span></span><span class="workflow-step-arrow">✓</span>
+          </button>
+        </section>
+
+        <section class="workflow-summary">
+          <div class="workflow-summary-head">
+            <div><small>СВОДКА ДЕТАЛИ</small><strong>Что уже собрано</strong></div>
+            <button type="button" data-route-button="projects">Все сохранённые данные</button>
+          </div>
+          <div class="workflow-summary-grid">
+            <div><span>Материал</span><strong id="workflowSummaryMaterial">—</strong></div>
+            <div><span>Геометрия</span><strong id="workflowSummaryGeometry">—</strong></div>
+            <div><span>Заготовка</span><strong id="workflowSummaryStock">—</strong></div>
+            <div><span>Режим</span><strong id="workflowSummaryMode">—</strong></div>
+            <div><span>Инструмент</span><strong id="workflowSummaryTool">—</strong></div>
+            <div><span>Маршрут</span><strong id="workflowSummaryRoute">—</strong></div>
+          </div>
         </section>
       </section>
 
@@ -839,5 +915,6 @@
   <script type="module" src="./modules/profile.js"></script>
   <script src="./modules/tools.js" defer></script>
   <script type="module" src="./modules/projects.js"></script>
+  <script type="module" src="./modules/workflow.js"></script>
 </body>
 </html>
