@@ -1,4 +1,5 @@
 import { computeBox, normalizeCount, layerLabel as coreLayerLabel, layoutText as coreLayoutText } from './box-core.mjs';
+import { updateWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -173,6 +174,17 @@ import { computeBox, normalizeCount, layerLabel as coreLayerLabel, layoutText as
     drawTop(s,dims);drawSide(el.side,s,s.x,dims.length,'bs');drawSide(el.end,s,s.y,dims.width,'be');drawIso(s,dims);saveLast();
   }
 
+  function commitWorkspace(){
+    const s=state();if(!complete(s))return;
+    updateWorkspace(w=>({
+      stock:w.stock||{diameter:s.d,partLength:s.h},
+      box:{
+        diameter:s.d,heightPerPart:s.h,x:s.x,y:s.y,z:s.z,layers:s.layers,mode:s.mode,
+        total:s.total,length:s.length,width:s.width,height:s.height
+      }
+    }),{source:'box'});
+  }
+
   function bump(input,delta){
     const isZ=input===el.z,current=isZ&&zOptional?1:(integer(input)??1),next=Math.max(1,Math.min(MAX_COUNT,current+delta));
     if(isZ&&next===1){zOptional=true;input.value=''}else{if(isZ)zOptional=false;input.value=next}
@@ -193,7 +205,7 @@ import { computeBox, normalizeCount, layerLabel as coreLayerLabel, layoutText as
   });
   document.querySelectorAll('[data-box-step]').forEach(button=>button.addEventListener('click',()=>bump($(button.dataset.boxStep),Number(button.dataset.delta))));
   document.querySelectorAll('[data-box-pack]').forEach(button=>button.addEventListener('click',()=>{mode=button.dataset.boxPack;saveMode();updateModeUI();render()}));
-  el.calc.addEventListener('click',()=>{render();document.getElementById('boxVisual')?.scrollIntoView({behavior:'smooth',block:'start'})});
+  el.calc.addEventListener('click',()=>{render();commitWorkspace();document.getElementById('boxVisual')?.scrollIntoView({behavior:'smooth',block:'start'})});
   el.reset.addEventListener('click',()=>{try{localStorage.removeItem(LAST_KEY)}catch{};el.d.value='';el.h.value='';el.x.value='';el.y.value='';el.z.value='';zOptional=true;mode='straight';saveMode();updateModeUI();render();el.d.focus()});
   el.copy.addEventListener('click',copy);
   render();
