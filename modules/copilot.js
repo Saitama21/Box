@@ -12,10 +12,9 @@ import { updateWorkspace } from './workspace-store.mjs';
   const isoColors={P:'#2788ff',M:'#f3cc28',K:'#e94b4b',N:'#39b95a',S:'#c77a3a',H:'#9ba3ad'};
   const defaults=defaultMachine();
 
-  const state={step:1,machine:loadMachine(),materialCode:'AISI304',stockDia:50,route:[],mode:'normal',results:[]};
+  const state={step:1,machine:loadMachine(),materialCode:'AISI304',stockDia:50,route:[],mode:'normal',results:[],workspaceSyncReady:false};
 
-  function saveRoute(){
-    try{localStorage.setItem(ROUTE_KEY,JSON.stringify({materialCode:state.materialCode,stockDia:state.stockDia,route:state.route,mode:state.mode}))}catch{}
+  function syncWorkspaceRoute(){
     const m=material();
     updateWorkspace(w=>({
       material:{code:m.code,id:m.id||m.code,label:m.name||m.code,iso:m.iso||''},
@@ -23,6 +22,10 @@ import { updateWorkspace } from './workspace-store.mjs';
       operations:state.route.map(r=>({...r})),
       machine:state.machine
     }),{source:'copilot-route'});
+  }
+  function saveRoute(){
+    try{localStorage.setItem(ROUTE_KEY,JSON.stringify({materialCode:state.materialCode,stockDia:state.stockDia,route:state.route,mode:state.mode}))}catch{}
+    if(state.workspaceSyncReady)syncWorkspaceRoute();
   }
   function restoreRoute(){try{const v=JSON.parse(localStorage.getItem(ROUTE_KEY)||'null');if(v){state.materialCode=v.materialCode||state.materialCode;state.stockDia=Number(v.stockDia)||state.stockDia;state.route=Array.isArray(v.route)?v.route:[];state.mode=['reliable','normal','productive'].includes(v.mode)?v.mode:'normal'}}catch{}}
   function uid(){return crypto.randomUUID?.()||'op-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
@@ -139,7 +142,8 @@ import { updateWorkspace } from './workspace-store.mjs';
     document.querySelectorAll('[data-cop-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.copMode));
     $('copRecalculate').onclick=calculateAll;
     subscribeMachine(profile=>{state.machine=profile;syncMachine();if(state.step===5)calculateAll()});
+    window.addEventListener('cnc-module-opened',e=>{if(e.detail?.id==='copilot'&&state.workspaceSyncReady)syncWorkspaceRoute()});
   }
 
-  restoreRoute();ensureRoute();syncMachine();$('copStockDia').value=state.stockDia;renderMaterials();syncMaterial();renderRoute();setMode(state.mode);bind();setStep(1);
+  restoreRoute();ensureRoute();syncMachine();$('copStockDia').value=state.stockDia;renderMaterials();syncMaterial();renderRoute();setMode(state.mode);bind();setStep(1);state.workspaceSyncReady=true;if(document.getElementById('app')?.dataset.module==='copilot')syncWorkspaceRoute();
 })();
