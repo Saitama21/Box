@@ -1,4 +1,4 @@
-const VERSION = '0.8.0';
+const VERSION = '0.8.1';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -12,6 +12,7 @@ const APP_SHELL = [
   './modules/box-core.mjs',
   './modules/modes.css',
   './modules/modes.js',
+  './modules/modes-data.mjs',
   './modules/cutcalc.css',
   './modules/cutcalc.js',
   './modules/cutcalc-core.mjs',
