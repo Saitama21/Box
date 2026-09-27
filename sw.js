@@ -1,4 +1,4 @@
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -35,6 +35,7 @@ const APP_SHELL = [
   './modules/tools.js',
   './modules/projects.css',
   './modules/projects.js',
+  './modules/project-store.mjs',
   './modules/workspace-store.mjs',
   './modules/workflow.css',
   './modules/workflow.js',
