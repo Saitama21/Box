@@ -768,18 +768,28 @@
           <section class="projects-hero">
             <small>ЕДИНАЯ ЛОКАЛЬНАЯ БАЗА</small>
             <h2>Проекты и данные</h2>
-            <p>Сводка того, что уже сохранено в модулях. Никакой второй параллельной базы — Projects читает существующие данные и ведёт в их исходный модуль.</p>
+            <p>Сохраняй текущую деталь как отдельный проект, открывай позже и продолжай с теми же геометрией, материалом, инструментом, маршрутом и результатами.</p>
             <div class="projects-stats">
-              <div><span>Сохранено</span><strong id="projectsTotal">0</strong></div>
-              <div><span>Источников с данными</span><strong id="projectsSourceCount">0</strong></div>
+              <div><span>Проектов</span><strong id="projectsSavedCount">0</strong></div>
+              <div><span>Локальных данных</span><strong id="projectsTotal">0</strong></div>
               <div><span>Режимов</span><strong id="projectsModeTotal">0</strong></div>
               <div><span>Мой шкаф</span><strong id="projectsToolTotal">0</strong></div>
             </div>
           </section>
 
           <div class="projects-toolbar">
+            <button class="primary" id="projectsSaveCurrent" type="button">＋ Сохранить текущую деталь</button>
             <button id="projectsRefresh" type="button">↻ Обновить</button>
-            <button class="primary" id="projectsExport" type="button">Экспорт workspace</button>
+            <button id="projectsExport" type="button">Экспорт библиотеки</button>
+          </div>
+
+          <div class="projects-section-title saved-title">
+            <div><small>МОИ ДЕТАЛИ</small><strong>Сохранённые проекты</strong></div>
+            <span>локально · офлайн</span>
+          </div>
+          <div class="saved-project-list" id="projectsSavedList"></div>
+          <div class="projects-empty saved-empty" id="projectsSavedEmpty">
+            <span>＋</span><strong>Сохранённых деталей пока нет</strong><p>Собери текущий Workflow и нажми «Сохранить текущую деталь».</p>
           </div>
 
           <div class="projects-source-grid">
