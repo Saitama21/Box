@@ -66,18 +66,19 @@ import { MODULE_REGISTRY, SHELL_ROUTES, moduleIds, moduleMeta, resolveView, isSh
     if (!meta) return false;
 
     const targetView = resolveView(key);
-    if (!document.querySelector(`.view[data-view="${CSS.escape(targetView)}"]`)) {
-      moduleEyebrow.textContent = meta.eyebrow;
-      moduleTitle.textContent = meta.title;
-      moduleDescription.textContent = meta.description;
-      moduleShellIcon.className = 'module-shell-icon';
-      moduleShellIcon.dataset.module = key;
-      setActiveView('module');
-      app.dataset.route = 'module';
-    } else {
-      setActiveView(targetView);
-      app.dataset.route = targetView;
+    const view = document.querySelector(`.view[data-view="${targetView}"]`);
+    if (!view) {
+      console.error('CNC module view is missing:', key, targetView);
+      showToast('Ошибка загрузки модуля · обновляю оболочку');
+      setActiveView('home');
+      syncDock('home');
+      app.dataset.route = 'home';
+      delete app.dataset.module;
+      return false;
     }
+
+    setActiveView(targetView);
+    app.dataset.route = targetView;
 
     syncDock('');
     app.dataset.module = key;
