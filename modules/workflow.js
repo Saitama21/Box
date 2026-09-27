@@ -126,7 +126,10 @@ import { loadMachine, subscribeMachine } from './machine-store.mjs';
     button.addEventListener('click',()=>{
       const target=button.dataset.workflowTarget;
       const type=button.dataset.workflowType||'module';
-      if(target==='workflow')return;
+      if(target==='workflow'){
+        document.getElementById('workflowResult')?.scrollIntoView({behavior:'smooth',block:'start'});
+        return;
+      }
       open(type,target);
     });
   });
