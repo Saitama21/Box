@@ -1,5 +1,5 @@
 import { computeBox, normalizeCount, layerLabel as coreLayerLabel, layoutText as coreLayoutText } from './box-core.mjs';
-import { updateWorkspace } from './workspace-store.mjs';
+import { updateWorkspace, loadWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -185,6 +185,22 @@ import { updateWorkspace } from './workspace-store.mjs';
     }),{source:'box'});
   }
 
+  function hydrateWorkspace(){
+    const w=loadWorkspace(),b=w.box||null;
+    if(b){
+      if(b.diameter!=null)el.d.value=b.diameter;
+      if(b.heightPerPart!=null)el.h.value=b.heightPerPart;
+      if(b.x!=null)el.x.value=b.x;
+      if(b.y!=null)el.y.value=b.y;
+      if(b.z!=null){el.z.value=b.z;zOptional=false}else{el.z.value='';zOptional=true}
+      if(b.mode==='staggered'||b.mode==='straight')mode=b.mode;
+    }else{
+      if(w.stock?.diameter!=null)el.d.value=w.stock.diameter;
+      if(w.stock?.partLength!=null)el.h.value=w.stock.partLength;
+    }
+    updateModeUI();render();
+  }
+
   function bump(input,delta){
     const isZ=input===el.z,current=isZ&&zOptional?1:(integer(input)??1),next=Math.max(1,Math.min(MAX_COUNT,current+delta));
     if(isZ&&next===1){zOptional=true;input.value=''}else{if(isZ)zOptional=false;input.value=next}
@@ -208,5 +224,6 @@ import { updateWorkspace } from './workspace-store.mjs';
   el.calc.addEventListener('click',()=>{render();commitWorkspace();document.getElementById('boxVisual')?.scrollIntoView({behavior:'smooth',block:'start'})});
   el.reset.addEventListener('click',()=>{try{localStorage.removeItem(LAST_KEY)}catch{};el.d.value='';el.h.value='';el.x.value='';el.y.value='';el.z.value='';zOptional=true;mode='straight';saveMode();updateModeUI();render();el.d.focus()});
   el.copy.addEventListener('click',copy);
+  window.addEventListener('cnc-module-opened',event=>{if(event.detail?.id==='box')hydrateWorkspace()});
   render();
 })();
