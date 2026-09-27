@@ -163,6 +163,12 @@
   setTheme(savedTheme);
   updateConnectivity();
 
+  window.CNCShell = {
+    openModule,
+    activateRoute,
+    modules: Object.keys(modules)
+  };
+
   const hashModule = location.hash.slice(1);
   if (modules[hashModule]) openModule(hashModule);
   else activateRoute('home');
