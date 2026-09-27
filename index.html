@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="./modules/modes.css">
   <link rel="stylesheet" href="./modules/cutcalc.css">
   <link rel="stylesheet" href="./modules/geometry.css">
+  <link rel="stylesheet" href="./modules/copilot.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -217,6 +218,96 @@
         <section class="modes-screen" data-modes-screen="search">
           <div class="modes-search-box"><span>⌕</span><input id="modesSearchInput" type="search" placeholder="Деталь, материал, инструмент…" autocomplete="off"><button id="modesClearSearch" type="button" aria-label="Очистить">×</button></div>
           <div class="modes-search-results" id="modesSearchResults"></div>
+        </section>
+      </section>
+
+      <section class="view copilot-view" data-view="copilot">
+        <div class="copilot-head">
+          <div class="copilot-head-left">
+            <button class="back-button" data-route-button="home" type="button">‹ <span>Главная</span></button>
+            <div class="copilot-head-copy"><small>АВТОНОМНЫЙ CNC-НАПАРНИК</small><strong>CNC Copilot</strong></div>
+          </div>
+          <span class="copilot-status"><i></i> ЛОКАЛЬНОЕ ЯДРО</span>
+        </div>
+
+        <nav class="copilot-progress" aria-label="Этапы CNC Copilot">
+          <button class="copilot-step is-active" data-copilot-step="1" type="button"><i>1</i><span>Станок</span></button>
+          <button class="copilot-step" data-copilot-step="2" type="button"><i>2</i><span>Материал</span></button>
+          <button class="copilot-step" data-copilot-step="3" type="button"><i>3</i><span>Операции</span></button>
+          <button class="copilot-step" data-copilot-step="4" type="button"><i>4</i><span>Стратегия</span></button>
+          <button class="copilot-step" data-copilot-step="5" type="button"><i>5</i><span>Результат</span></button>
+        </nav>
+
+        <section class="copilot-screen is-active" data-copilot-screen="1">
+          <section class="copilot-hero">
+            <small>01 · СТАНОК</small>
+            <h2 id="copMachineName">Tengyue CK52PT-Y</h2>
+            <p id="copMachineControl">SINUMERIK 828D / ShopTurn</p>
+            <div class="copilot-machine-live">
+              <div><span>Макс. шпиндель</span><strong id="copMachineLiveRpm">4000 rpm</strong></div>
+              <div><span>Расчётная мощность</span><strong id="copMachineLivePower">17 kW</strong></div>
+              <div><span>Гидроцилиндр</span><strong id="copMachineLiveCylinder">BK-1552 · 6000</strong></div>
+              <div><span>Стойка</span><strong id="copMachineLiveControl">828D</strong></div>
+            </div>
+          </section>
+          <section class="copilot-panel">
+            <div class="copilot-panel-head"><div><small>ОГРАНИЧЕНИЯ</small><strong>Текущая установка</strong></div><span>общий профиль</span></div>
+            <div class="copilot-fields">
+              <label class="copilot-field"><span>Макс. RPM станка</span><input id="copMachineMaxRpm" type="number" min="100" step="10" value="4000"></label>
+              <label class="copilot-field"><span>Мощность, kW</span><input id="copMachinePower" type="number" min="1" step="0.1" value="17"></label>
+              <label class="copilot-field wide"><span>Лимит текущего патрона / кулачков, RPM</span><input id="copSetupMaxRpm" type="number" min="100" step="10" placeholder="не задан"></label>
+            </div>
+          </section>
+          <div class="copilot-nav-actions"><button class="copilot-next" data-cop-next="2" type="button">Материал →</button></div>
+        </section>
+
+        <section class="copilot-screen" data-copilot-screen="2">
+          <section class="copilot-panel">
+            <div class="copilot-panel-head"><div><small>02 · МАТЕРИАЛ</small><strong>Заготовка</strong></div><span id="copSelectedIso">ISO M</span></div>
+            <div class="copilot-material-search"><span>⌕</span><input id="copMaterialSearch" type="search" placeholder="AISI 304, C45, PA6…" autocomplete="off"></div>
+            <div class="copilot-material-list" id="copMaterialList"></div>
+          </section>
+          <section class="copilot-panel">
+            <div class="copilot-panel-head"><div><small>ВЫБРАНО</small><strong id="copSelectedMaterial">AISI304</strong></div></div>
+            <div class="copilot-fields"><label class="copilot-field"><span>Диаметр заготовки Ø, мм</span><input id="copStockDia" type="number" min="0.1" step="0.1" value="50"></label></div>
+            <p id="copMaterialNote" style="margin:9px 0 0;color:var(--muted);font-size:9px;line-height:1.45"></p>
+          </section>
+          <div class="copilot-nav-actions"><button class="copilot-prev" data-cop-prev="1" type="button">← Станок</button><button class="copilot-next" data-cop-next="3" type="button">Операции →</button></div>
+        </section>
+
+        <section class="copilot-screen" data-copilot-screen="3">
+          <section class="copilot-panel">
+            <div class="copilot-panel-head"><div><small>03 · ТЕХПРОЦЕСС</small><strong>Маршрут операций</strong></div><span id="copRouteCount">1 оп.</span></div>
+            <div class="copilot-route-list" id="copRouteList"></div>
+            <button class="copilot-add-op" id="copAddOperation" type="button">＋ Добавить операцию</button>
+          </section>
+          <div class="copilot-nav-actions"><button class="copilot-prev" data-cop-prev="2" type="button">← Материал</button><button class="copilot-next" data-cop-next="4" type="button">Стратегия →</button></div>
+        </section>
+
+        <section class="copilot-screen" data-copilot-screen="4">
+          <section class="copilot-panel">
+            <div class="copilot-panel-head"><div><small>04 · СТРАТЕГИЯ</small><strong>Режим работы</strong></div><span>детерминированное ядро</span></div>
+            <div class="copilot-strategy">
+              <button data-cop-mode="reliable" type="button"><strong>Надёжная</strong><small>нижняя зона режима</small></button>
+              <button class="is-active" data-cop-mode="normal" type="button"><strong>Рабочая</strong><small>середина диапазона</small></button>
+              <button data-cop-mode="productive" type="button"><strong>Производительная</strong><small>верхняя зона режима</small></button>
+            </div>
+          </section>
+          <section class="copilot-panel">
+            <div class="copilot-panel-head"><div><small>ПЕРЕД РАСЧЁТОМ</small><strong>Что учитывается</strong></div></div>
+            <div class="copilot-machine-live">
+              <div><span>Материал</span><strong>ISO-группа + machinability</strong></div>
+              <div><span>Операция</span><strong>коэффициенты Vc/f/ap</strong></div>
+              <div><span>Ограничение S</span><strong>минимум физ. лимитов</strong></div>
+              <div><span>Мощность</span><strong>оценка нагрузки</strong></div>
+            </div>
+          </section>
+          <div class="copilot-nav-actions"><button class="copilot-prev" data-cop-prev="3" type="button">← Операции</button><button class="copilot-next" data-cop-next="5" type="button">Рассчитать →</button></div>
+        </section>
+
+        <section class="copilot-screen" data-copilot-screen="5">
+          <div class="copilot-results" id="copResults"></div>
+          <div class="copilot-nav-actions"><button class="copilot-prev" data-cop-prev="4" type="button">← Стратегия</button><button class="copilot-next" id="copRecalculate" type="button">↻ Пересчитать</button></div>
         </section>
       </section>
 
@@ -551,5 +642,7 @@
   <script src="./modules/modes.js" defer></script>
   <script type="module" src="./modules/cutcalc.js"></script>
   <script type="module" src="./modules/geometry.js"></script>
+  <script src="./modules/copilot-data.js" defer></script>
+  <script type="module" src="./modules/copilot.js"></script>
 </body>
 </html>
