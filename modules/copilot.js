@@ -1,6 +1,7 @@
 import { calculateMachining, OPERATIONS } from './copilot-core.mjs';
 import { MATERIALS } from './copilot-materials.mjs';
 import { defaultMachine, loadMachine, saveMachine, subscribeMachine } from './machine-store.mjs';
+import { updateWorkspace } from './workspace-store.mjs';
 
 (() => {
   'use strict';
@@ -13,7 +14,16 @@ import { defaultMachine, loadMachine, saveMachine, subscribeMachine } from './ma
 
   const state={step:1,machine:loadMachine(),materialCode:'AISI304',stockDia:50,route:[],mode:'normal',results:[]};
 
-  function saveRoute(){try{localStorage.setItem(ROUTE_KEY,JSON.stringify({materialCode:state.materialCode,stockDia:state.stockDia,route:state.route,mode:state.mode}))}catch{}}
+  function saveRoute(){
+    try{localStorage.setItem(ROUTE_KEY,JSON.stringify({materialCode:state.materialCode,stockDia:state.stockDia,route:state.route,mode:state.mode}))}catch{}
+    const m=material();
+    updateWorkspace(w=>({
+      material:{code:m.code,id:m.id||m.code,label:m.name||m.code,iso:m.iso||''},
+      stock:{...(w.stock||{}),diameter:state.stockDia||null},
+      operations:state.route.map(r=>({...r})),
+      machine:state.machine
+    }),{source:'copilot-route'});
+  }
   function restoreRoute(){try{const v=JSON.parse(localStorage.getItem(ROUTE_KEY)||'null');if(v){state.materialCode=v.materialCode||state.materialCode;state.stockDia=Number(v.stockDia)||state.stockDia;state.route=Array.isArray(v.route)?v.route:[];state.mode=['reliable','normal','productive'].includes(v.mode)?v.mode:'normal'}}catch{}}
   function uid(){return crypto.randomUUID?.()||'op-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
   function material(){return MATERIALS.find(m=>m.code===state.materialCode)||MATERIALS.find(m=>m.code==='AISI304')||MATERIALS[0]}
@@ -81,7 +91,26 @@ import { defaultMachine, loadMachine, saveMachine, subscribeMachine } from './ma
   function calculateAll(){
     if(!state.route.length){$('copResults').innerHTML='<div class="copilot-empty"><span>⌁</span><strong>Маршрут пуст</strong><p>Вернись на шаг «Операции» и добавь хотя бы одну.</p></div>';return}
     const out=[];try{for(const r of state.route)out.push({route:r,result:calculateMachining(inputFor(r))})}catch(err){$('copResults').innerHTML=`<div class="copilot-empty"><span>!</span><strong>Не хватает данных</strong><p>${String(err.message||err)}</p></div>`;return}
-    state.results=out;renderResults();
+    state.results=out;
+    updateWorkspace({
+      results:{
+        copilot:{
+          count:out.length,
+          calculatedAt:new Date().toISOString(),
+          items:out.map(({route,result})=>({
+            route:{...route},
+            operation:result.operation?.label||route.operation,
+            spindleRpm:result.spindleRpm,
+            feedMmRev:result.feedMmRev,
+            vcActual:result.vcActual,
+            apMm:result.apMm,
+            warnings:result.warnings||[],
+            machineInput:result.machineInput||null
+          }))
+        }
+      }
+    },{source:'copilot-result'});
+    renderResults();
   }
   function renderResults(){
     const root=$('copResults');root.innerHTML='';
