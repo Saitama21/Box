@@ -1,4 +1,4 @@
-const VERSION = '0.6.0';
+const VERSION = '0.7.0';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -23,6 +23,9 @@ const APP_SHELL = [
   './modules/copilot-core.mjs',
   './modules/copilot-materials.mjs',
   './modules/copilot-data.js',
+  './modules/codes.css',
+  './modules/codes.js',
+  './modules/codes-data.mjs',
   './assets/cutcalc/result-rod.webp',
   './assets/cutcalc/rod-brass.webp',
   './assets/cutcalc/rod-steel.webp',
