@@ -41,6 +41,7 @@
   <link rel="stylesheet" href="./modules/tools.css">
   <link rel="stylesheet" href="./modules/projects.css">
   <link rel="stylesheet" href="./modules/workflow.css">
+  <link rel="stylesheet" href="./modules/result.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -216,6 +217,60 @@
             <div><span>Инструмент</span><strong id="workflowSummaryTool">—</strong></div>
             <div><span>Маршрут</span><strong id="workflowSummaryRoute">—</strong></div>
           </div>
+        </section>
+
+        <section class="workflow-result" id="workflowResult">
+          <div class="result-head">
+            <div class="result-head-copy">
+              <small>07 · РЕЗУЛЬТАТ</small>
+              <strong id="workflowResultTitle">Новая деталь</strong>
+              <span id="workflowResultMeta">Tengyue CK52PT-Y · SINUMERIK 828D</span>
+            </div>
+            <div class="result-state" id="workflowResultState"><i></i><span>НЕ ХВАТАЕТ ДАННЫХ</span></div>
+          </div>
+
+          <div class="result-missing" id="workflowResultMissing"></div>
+
+          <div class="result-facts">
+            <div class="result-fact"><span>Материал</span><strong id="workflowResultMaterial">—</strong></div>
+            <div class="result-fact"><span>Заготовка</span><strong id="workflowResultStock">—</strong></div>
+            <div class="result-fact"><span>Геометрия</span><strong id="workflowResultGeometry">—</strong></div>
+            <div class="result-fact"><span>Инструмент</span><strong id="workflowResultTool">—</strong></div>
+            <div class="result-fact"><span>Проверенный режим</span><strong id="workflowResultMode">—</strong></div>
+            <div class="result-fact"><span>CutCalc</span><strong id="workflowResultCutcalc">—</strong></div>
+            <div class="result-fact"><span>Box</span><strong id="workflowResultBox">—</strong></div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-section-head">
+              <div><small>ТЕХПРОЦЕСС</small><strong>Операции Co-Pilot</strong></div>
+              <span id="workflowResultOpCount">0 операций</span>
+            </div>
+            <div class="result-ops" id="workflowResultOps"></div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-section-head">
+              <div><small>ДЛЯ СТОЙКИ</small><strong>Черновик команд</strong></div>
+              <span>проверка перед запуском обязательна</span>
+            </div>
+          </div>
+
+          <div class="result-code-wrap">
+            <div class="result-code-head"><span>NC DRAFT · SINUMERIK</span><b>OFFLINE</b></div>
+            <pre class="result-code" id="workflowResultCode">; Нет рассчитанных операций Co-Pilot</pre>
+          </div>
+
+          <div class="result-actions">
+            <button id="resultCopySummary" type="button">⧉ Копировать сводку</button>
+            <button id="resultDownloadTxt" type="button">↓ Техкарта .TXT</button>
+            <button id="resultDownloadJson" type="button">↓ Проект .JSON</button>
+            <button id="resultCopyNc" type="button">⧉ Копировать NC</button>
+            <button class="primary" id="resultDownloadNc" type="button">↓ Черновик .NC</button>
+            <button id="resultOpenCopilot" type="button">↗ Открыть Co-Pilot</button>
+          </div>
+
+          <p class="result-disclaimer">Черновик .NC собирается только из уже рассчитанных режимов Co-Pilot. Он не добавляет траектории движения, смену инструмента, нули детали или безопасные подводы, которых нет в текущем проекте.</p>
         </section>
       </section>
 
@@ -923,5 +978,6 @@
   <script src="./modules/tools.js" defer></script>
   <script type="module" src="./modules/projects.js"></script>
   <script type="module" src="./modules/workflow.js"></script>
+  <script type="module" src="./modules/result.js"></script>
 </body>
 </html>
