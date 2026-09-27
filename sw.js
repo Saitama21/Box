@@ -1,4 +1,4 @@
-const VERSION = '0.2.0';
+const VERSION = '0.2.1';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -9,6 +9,7 @@ const APP_SHELL = [
   './app.js',
   './modules/box.css',
   './modules/box.js',
+  './modules/box-core.mjs',
   './manifest.webmanifest',
   './.nojekyll'
 ];
