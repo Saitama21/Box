@@ -9,6 +9,7 @@
 - `modules/machine-store.mjs` — единый профиль станка с сохранением ключа `cncFullMachineV1`;
 - расчётные ядра (`*-core.mjs`) отделены от интерфейса;
 - Projects не создаёт вторую копию данных: он агрегирует существующие хранилища модулей;
+- `modules/workspace-store.mjs` хранит только текущую рабочую деталь и связывает результаты модулей в один техпроцесс;
 - исходный Box сохранён в `legacy-box/` до завершения миграции и регрессии;
 - GitHub Pages публикует новую оболочку из корня.
 
@@ -23,6 +24,7 @@
 7. Общий инструментальный шкаф
 8. Projects / сводка локальных данных
 9. Общий профиль станка
+10. Сквозной Workflow / текущая деталь
 
 ## Данные
 
@@ -33,7 +35,8 @@
 - Tool cupboard: `cncFullToolsV2`;
 - CutCalc history: `cutcalc.history.v3`;
 - Geometry projects: `cnc-geometry-projects-v1`;
-- Copilot route: `cnc-suite.copilot.route-v1`.
+- Copilot route: `cnc-suite.copilot.route-v1`;
+- Active workspace: `cnc-suite.workspace-v1`.
 
 ## UI contract — Bottom Dock
 
@@ -52,7 +55,7 @@ height: 68px;
 
 ## Offline-first
 
-Критическая оболочка, модули, общие stores и локальные WebP-ассеты входят в precache собственного Service Worker. После успешной первой загрузки основные рабочие разделы доступны без сети.
+Критическая оболочка, модули, общие stores, Workflow и локальные WebP-ассеты входят в precache собственного Service Worker. После успешной первой загрузки основные рабочие разделы доступны без сети.
 
 Новые визуальные PWA-иконки не добавляются автоматически: графические ассеты сначала утверждаются визуально, затем внедряются.
 
