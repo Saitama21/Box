@@ -34,11 +34,15 @@
     }catch{}
   }
 
+  function activeToolId(){
+    try{return JSON.parse(localStorage.getItem('cnc-suite.workspace-v1')||'{}')?.tool?.id||''}catch{return''}
+  }
+
   function render(){
     stats();const root=$('toolsGrid');root.innerHTML='';const rows=filtered();
     if(!rows.length){root.innerHTML='<div class="tools-empty"><span>◇</span><strong>Ничего не найдено</strong><p>Сбрось фильтр или добавь свою пластину/державку.</p></div>';return}
     rows.forEach(t=>{
-      const isLocal=t.libraryType==='cupboard',card=document.createElement('article');card.className='tool-card'+(isLocal?' is-local':'');
+      const isLocal=t.libraryType==='cupboard',card=document.createElement('article');card.className='tool-card'+(isLocal?' is-local':'')+(t.id===activeToolId()?' is-workflow-active':'');
       card.innerHTML=`<div class="tool-card-art"></div><div class="tool-card-copy"><small>${isLocal?'МОЙ ШКАФ':'КАТАЛОГ'}</small><strong></strong><span class="tool-desc"></span><div class="tool-card-meta"></div></div><div class="tool-card-actions"></div>`;
       card.querySelector('strong').textContent=t.insert||'Инструмент';card.querySelector('.tool-desc').textContent=(t.holder||'Державка не указана')+' · '+(t.grade||'grade —')+' · '+(t.breaker||'стружколом —');
       const meta=card.querySelector('.tool-card-meta');for(const s of [...(t.iso||[]).map(x=>'ISO '+x),...(isLocal?[String(t.quantity||0)+' шт',t.location||'без ячейки']:[])]){const i=document.createElement('i');i.textContent=s;meta.appendChild(i)}
@@ -61,7 +65,8 @@
   function remove(){if(!state.editing)return;if(confirm('Удалить инструмент из шкафа?')){save(local().filter(x=>x.id!==state.editing));$('toolDialog').close();render()}}
 
   $('toolsSearch').oninput=e=>{state.query=e.target.value;render()};document.querySelectorAll('[data-tools-iso]').forEach(b=>b.onclick=()=>{state.iso=b.dataset.toolsIso;document.querySelectorAll('[data-tools-iso]').forEach(x=>x.classList.toggle('is-active',x===b));render()});$('toolsAdd').onclick=()=>openForm();$('toolDialogClose').onclick=()=>$('toolDialog').close();$('toolForm').onsubmit=submit;$('toolDelete').onclick=remove;
-  window.addEventListener('cnc-local-data-changed',e=>{if(e.detail?.key===KEY)render()});
+  window.addEventListener('cnc-local-data-changed',e=>{if(e.detail?.key===KEY||e.detail?.key==='cnc-suite.workspace-v1')render()});
+  window.addEventListener('cnc-route-opened',e=>{if(e.detail?.route==='tools')render()});
   window.CNCTools={all,local,render};
   render();
 })();
