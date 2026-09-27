@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="./modules/codes.css">
   <link rel="stylesheet" href="./modules/profile.css">
   <link rel="stylesheet" href="./modules/tools.css">
+  <link rel="stylesheet" href="./modules/projects.css">
 </head>
 <body>
   <div id="app" class="app-shell" data-route="home">
@@ -625,8 +626,62 @@
       </section>
 
       <section class="view simple-view" data-view="projects">
-        <div class="simple-title"><p class="eyebrow">ПРОЕКТЫ</p><h2>Локальная база</h2><p>Одна точка для сохранённых деталей, расчётов, режимов и маршрутов.</p></div>
-        <div class="empty-panel"><span>▣</span><strong>Проекты появятся здесь</strong><p>Данные будут храниться локально и оставаться доступными офлайн.</p></div>
+        <div class="projects-hub">
+          <section class="projects-hero">
+            <small>ЕДИНАЯ ЛОКАЛЬНАЯ БАЗА</small>
+            <h2>Проекты и данные</h2>
+            <p>Сводка того, что уже сохранено в модулях. Никакой второй параллельной базы — Projects читает существующие данные и ведёт в их исходный модуль.</p>
+            <div class="projects-stats">
+              <div><span>Сохранено</span><strong id="projectsTotal">0</strong></div>
+              <div><span>Источников с данными</span><strong id="projectsSourceCount">0</strong></div>
+              <div><span>Режимов</span><strong id="projectsModeTotal">0</strong></div>
+              <div><span>Мой шкаф</span><strong id="projectsToolTotal">0</strong></div>
+            </div>
+          </section>
+
+          <div class="projects-toolbar">
+            <button id="projectsRefresh" type="button">↻ Обновить</button>
+            <button class="primary" id="projectsExport" type="button">Экспорт workspace</button>
+          </div>
+
+          <div class="projects-source-grid">
+            <article class="projects-source" style="--p-accent:var(--blue)">
+              <div class="projects-source-head"><div><small>CNC REFERENCE</small><strong>Режимы обработки</strong></div><b id="projectsModesCount">0</b></div>
+              <p>Личные проверенные режимы из совместимой IndexedDB.</p>
+              <button data-projects-open="modes" type="button">Открыть базу</button>
+            </article>
+            <article class="projects-source" style="--p-accent:var(--orange)">
+              <div class="projects-source-head"><div><small>CUT CALC CNC</small><strong>История расчётов</strong></div><b id="projectsCutcalcCount">0</b></div>
+              <p>Сохранённые расчёты партии и расхода заготовки.</p>
+              <button data-projects-open="cutcalc" type="button">Открыть CutCalc</button>
+            </article>
+            <article class="projects-source" style="--p-accent:var(--purple)">
+              <div class="projects-source-head"><div><small>CNC GEOMETRY</small><strong>Геометрические проекты</strong></div><b id="projectsGeometryCount">0</b></div>
+              <p>Сохранённые вычисления, координаты и параметры геометрии.</p>
+              <button data-projects-open="geometry" type="button">Открыть Geometry</button>
+            </article>
+            <article class="projects-source" style="--p-accent:var(--orange)">
+              <div class="projects-source-head"><div><small>ИНСТРУМЕНТ</small><strong>Мой шкаф</strong></div><b id="projectsToolsCount">0</b></div>
+              <p>Локальные пластины, державки, наличие и ячейки хранения.</p>
+              <button data-route-button="tools" type="button">Открыть шкаф</button>
+            </article>
+            <article class="projects-source" style="--p-accent:var(--cyan)">
+              <div class="projects-source-head"><div><small>CNC COPILOT</small><strong>Текущий маршрут</strong></div><b id="projectsCopilotCount">0</b></div>
+              <p>Количество операций в текущем сохранённом техпроцессе.</p>
+              <button data-projects-open="copilot" type="button">Открыть маршрут</button>
+            </article>
+          </div>
+
+          <div class="projects-section-title">
+            <div><small>ПОСЛЕДНИЕ ДАННЫЕ</small><strong>Недавняя работа</strong></div>
+            <span><b id="projectsRecentCount">0</b> записей</span>
+          </div>
+          <div class="projects-list" id="projectsList"></div>
+          <div class="projects-empty" id="projectsEmpty">
+            <span>▣</span><strong>Пока пусто</strong><p>Сохрани расчёт, геометрию или проверенный режим — он появится здесь автоматически.</p>
+          </div>
+          <div class="projects-toast" id="projectsToast" hidden></div>
+        </div>
       </section>
 
       <section class="view simple-view" data-view="profile">
@@ -773,7 +828,7 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="./app.js" defer></script>
+  <script type="module" src="./app.js"></script>
   <script type="module" src="./modules/box.js"></script>
   <script type="module" src="./modules/modes.js"></script>
   <script type="module" src="./modules/cutcalc.js"></script>
@@ -781,7 +836,8 @@
   <script src="./modules/copilot-data.js" defer></script>
   <script type="module" src="./modules/copilot.js"></script>
   <script type="module" src="./modules/codes.js"></script>
-  <script src="./modules/profile.js" defer></script>
+  <script type="module" src="./modules/profile.js"></script>
   <script src="./modules/tools.js" defer></script>
+  <script type="module" src="./modules/projects.js"></script>
 </body>
 </html>
