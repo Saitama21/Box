@@ -1,112 +1,182 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f4f7f6" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Box" />
-  <meta name="description" content="Offline-first калькулятор количества и габаритов укладки деталей." />
-  <link rel="manifest" href="./manifest.webmanifest?v=3.4.0" />
-  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="./icon.svg" />
-  <link rel="stylesheet" href="./styles.css?v=3.4.0" />
-  <link rel="stylesheet" href="./enhancements.css?v=3.4.0" />
-  <title>Box — калькулятор укладки</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#071019">
+  <meta name="color-scheme" content="dark light">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CNC Copilot">
+  <meta name="description" content="Единая offline-first CNC-система: режимы, расчёты, укладка, геометрия, напарник и справочник G/M-кодов.">
+  <title>CNC Copilot — Offline Workshop</title>
+  <script>
+    (() => {
+      try {
+        const saved = localStorage.getItem('cnc-suite.theme') || 'dark';
+        document.documentElement.dataset.theme = saved;
+      } catch {}
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js', { scope:'./', updateViaCache:'none' }).catch(() => {});
+        }, { once:true });
+      }
+    })();
+  </script>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <div class="app-shell">
+  <div id="app" class="app-shell" data-route="home">
+    <div class="ambient ambient-a" aria-hidden="true"></div>
+    <div class="ambient ambient-b" aria-hidden="true"></div>
+    <div class="industrial-grid" aria-hidden="true"></div>
+
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true">◇</span>
-        <div><strong>Box</strong><span>Калькулятор укладки</span></div>
+        <div class="brand-mark" aria-hidden="true"><span>C</span></div>
+        <div class="brand-copy">
+          <p>CNC WORKSHOP</p>
+          <h1>CNC Copilot</h1>
+          <small>FULL · OFFLINE</small>
+        </div>
       </div>
       <div class="top-actions">
-        <div class="theme-switch" role="group" aria-label="Тема">
-          <button id="themeLight" type="button" class="is-active" aria-label="Светлая тема">☀</button>
-          <button id="themeDark" type="button" aria-label="Тёмная тема">◐</button>
-        </div>
-        <div class="offline-badge"><span class="wifi-dot">●</span><div><strong id="offlineState">Работает офлайн</strong><small>BOX PWA</small></div></div>
-        <button id="installButton" class="install-btn is-hidden" type="button">Установить</button>
+        <div class="offline-state" id="offlineState"><i></i><span>Проверка офлайна</span></div>
+        <button class="round-button" id="themeToggle" type="button" aria-label="Переключить тему">◐</button>
       </div>
     </header>
 
-    <main class="workspace">
-      <aside class="sidebar">
-        <section class="control-section">
-          <div class="section-title"><span>1</span><h2>Размер детали</h2></div>
-          <label class="select-row">
-            <span class="part-icon" aria-hidden="true"></span>
-            <select id="partShape" aria-label="Форма детали">
-              <option value="cylinder">Цилиндр</option>
-            </select>
-          </label>
-          <div class="field-grid two">
-            <label><span>Диаметр, мм</span><input id="partDiameter" type="number" min="0.1" max="3000" step="0.1" value="50" inputmode="decimal" /></label>
-            <label><span>Высота, мм</span><input id="partHeight" type="number" min="0.1" max="3000" step="0.1" value="20" inputmode="decimal" /></label>
+    <main class="viewport">
+      <section class="view is-active" data-view="home">
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">ЕДИНАЯ CNC-СИСТЕМА</p>
+            <h2>Всё для работы<br><span>у станка.</span></h2>
+            <p class="hero-text">Режимы, расчёты, геометрия, укладка, справочник и CNC-напарник — в одном offline-first приложении.</p>
+            <div class="hero-badges">
+              <span><i class="dot green"></i>Offline-ready</span>
+              <span>828D</span>
+              <span>CK52PT-Y</span>
+            </div>
+          </div>
+          <div class="hero-machine" aria-hidden="true">
+            <div class="machine-panel">
+              <div class="machine-screen"><span>S</span><b>2480</b><small>RPM</small></div>
+              <div class="machine-body"></div>
+              <div class="machine-chuck"><i></i><i></i><i></i></div>
+              <div class="machine-stock"></div>
+              <div class="machine-tool"></div>
+              <div class="machine-rail"></div>
+            </div>
           </div>
         </section>
 
-        <section class="control-section">
-          <div class="section-title"><span>2</span><h2>Укладка</h2></div>
-          <div class="field-grid three">
-            <label><span>По длине (X)</span><input id="countX" type="number" min="1" max="999" step="1" value="9" inputmode="numeric" /></label>
-            <label><span>По ширине (Y)</span><input id="countY" type="number" min="1" max="999" step="1" value="5" inputmode="numeric" /></label>
-            <label class="optional-z"><span>По высоте (Z) <small>необяз.</small></span><input id="countZ" type="number" min="1" max="999" step="1" value="" placeholder="1" inputmode="numeric" aria-label="По высоте Z, необязательно. Пустое поле означает один слой" /></label>
-          </div>
-          <p class="optional-note">Z можно оставить пустым — тогда считаем один слой.</p>
-        </section>
-
-        <div class="sidebar-actions">
-          <button id="calculateButton" class="primary-btn" type="button">Рассчитать</button>
-          <button id="newButton" class="secondary-btn" type="button">↻ Новый расчёт</button>
+        <div class="section-heading">
+          <div><p>МОДУЛИ</p><h3>Рабочая система</h3></div>
+          <span class="module-count">6 модулей</span>
         </div>
 
-        <section class="mini-summary" aria-live="polite">
-          <span>Итого</span>
-          <strong><b id="miniTotal">45</b> шт.</strong>
-          <small id="miniFormula">9 × 5 · 1 слой</small>
+        <section class="module-grid" id="moduleGrid">
+          <button class="module-card accent-blue" data-module="modes" type="button">
+            <span class="module-number">01</span>
+            <span class="module-icon icon-modes" aria-hidden="true"></span>
+            <span class="module-content"><small>МОЯ БАЗА</small><strong>Режимы обработки</strong><em>Проверенные режимы и реальные детали</em></span>
+            <span class="module-arrow">›</span>
+          </button>
+
+          <button class="module-card accent-orange" data-module="cutcalc" type="button">
+            <span class="module-number">02</span>
+            <span class="module-icon icon-calc" aria-hidden="true"></span>
+            <span class="module-content"><small>CUT CALC CNC</small><strong>Цеховые расчёты</strong><em>Расход прутка, торцовка, отрезка и партия</em></span>
+            <span class="module-arrow">›</span>
+          </button>
+
+          <button class="module-card accent-green" data-module="box" type="button">
+            <span class="module-number">03</span>
+            <span class="module-icon icon-box" aria-hidden="true"></span>
+            <span class="module-content"><small>BOX</small><strong>Укладка заготовок</strong><em>Количество, слои, габариты и проекции</em></span>
+            <span class="module-arrow">›</span>
+          </button>
+
+          <button class="module-card accent-purple" data-module="geometry" type="button">
+            <span class="module-number">04</span>
+            <span class="module-icon icon-geometry" aria-hidden="true"></span>
+            <span class="module-content"><small>CNC GEOMETRY</small><strong>Геометрия</strong><em>Координаты, PCD, дуги, куб, шар и ось C</em></span>
+            <span class="module-arrow">›</span>
+          </button>
+
+          <button class="module-card accent-cyan" data-module="copilot" type="button">
+            <span class="module-number">05</span>
+            <span class="module-icon icon-copilot" aria-hidden="true"></span>
+            <span class="module-content"><small>CNC COPILOT</small><strong>Напарник</strong><em>Техпроцесс, инструмент, режимы и контроль</em></span>
+            <span class="module-arrow">›</span>
+          </button>
+
+          <button class="module-card accent-yellow" data-module="codes" type="button">
+            <span class="module-number">06</span>
+            <span class="module-icon icon-codes" aria-hidden="true"></span>
+            <span class="module-content"><small>SINUMERIK 828D</small><strong>Справочник G/M-кодов</strong><em>Поиск, избранное и быстрые команды</em></span>
+            <span class="module-arrow">›</span>
+          </button>
         </section>
-      </aside>
 
-      <section class="visual-area">
-        <div class="mobile-views-hint" aria-hidden="true"><span>Проекции</span><b>Листай →</b></div>
-        <div class="projection-grid">
-          <article class="projection-card">
-            <header><h3>Вид сверху <span>(X × Y)</span></h3><b id="topSize">450 × 250 мм</b></header>
-            <div id="topProjection" class="projection-stage" role="img" aria-label="Вид сверху на детали"></div>
-          </article>
-
-          <article class="projection-card">
-            <header><h3>Вид сбоку <span>(X × Z)</span></h3><b id="sideSize">450 × 20 мм</b></header>
-            <div id="sideProjection" class="projection-stage" role="img" aria-label="Вид сбоку на детали"></div>
-          </article>
-
-          <article class="projection-card">
-            <header><h3>Вид с торца <span>(Y × Z)</span></h3><b id="endSize">250 × 20 мм</b></header>
-            <div id="endProjection" class="projection-stage" role="img" aria-label="Вид с торца на детали"></div>
-          </article>
-
-          <article class="projection-card preview-card">
-            <header><h3>Общий вид</h3><b id="previewLabel">45 деталей · 1 слой</b></header>
-            <div id="isoProjection" class="projection-stage" role="img" aria-label="Общий вид укладки деталей"></div>
-          </article>
-        </div>
-
-        <section class="result-bar" aria-live="polite">
-          <div class="result-total"><span>Итого</span><strong><b id="totalCount">45</b> шт.</strong></div>
-          <div class="result-copy">
-            <p id="resultPart">Деталь: Ø50 × 20 мм</p>
-            <p id="resultLayout">Укладка: 9 × 5 · 1 слой</p>
-            <p id="resultBlock">Габариты блока: 450 × 250 × 20 мм</p>
-          </div>
-          <button id="copyButton" class="copy-btn" type="button"><span aria-hidden="true">⧉</span><b>Скопировать</b></button>
+        <section class="machine-summary">
+          <div class="summary-head"><span>МОЙ СТАНОК</span><i>● READY</i></div>
+          <div class="summary-main"><div><strong>Tengyue CK52PT-Y</strong><small>SINUMERIK 828D · ShopTurn</small></div><button type="button" data-route-button="profile">Настроить ›</button></div>
+          <div class="summary-specs"><span><small>Шпиндель</small><b>4000 rpm</b></span><span><small>Револьвер</small><b>15 поз.</b></span><span><small>Оси</small><b>X / Z / Y / C</b></span></div>
         </section>
       </section>
+
+      <section class="view module-view" data-view="module">
+        <button class="back-button" id="backButton" type="button">‹ <span>Главная</span></button>
+        <div class="module-shell">
+          <div class="module-shell-icon" id="moduleShellIcon"></div>
+          <p class="eyebrow" id="moduleEyebrow">МОДУЛЬ</p>
+          <h2 id="moduleTitle">Раздел</h2>
+          <p id="moduleDescription">Модуль будет подключён нативно в общий интерфейс.</p>
+          <div class="integration-status">
+            <span><i class="dot green"></i>Оболочка готова</span>
+            <span><i class="dot orange"></i>Интеграция логики — следующий этап</span>
+          </div>
+          <div class="module-preview-grid">
+            <article><span>01</span><strong>Сохраняем логику</strong><p>Исходные вычисления и сценарии не переписываются без необходимости.</p></article>
+            <article><span>02</span><strong>Единый UI</strong><p>Модуль получает общую навигацию, тему, профиль станка и offline-core.</p></article>
+            <article><span>03</span><strong>Регрессия</strong><p>Перед удалением старой версии проверяем расчёты и работу без сети.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="view simple-view" data-view="tools">
+        <div class="simple-title"><p class="eyebrow">ИНСТРУМЕНТ</p><h2>Мой шкаф</h2><p>Общий инструментальный модуль будет связан с режимами, геометрией и CNC Copilot.</p></div>
+        <div class="empty-panel"><span>◇</span><strong>Каркас готов</strong><p>Инструментальная база подключится отдельным этапом.</p></div>
+      </section>
+
+      <section class="view simple-view" data-view="projects">
+        <div class="simple-title"><p class="eyebrow">ПРОЕКТЫ</p><h2>Локальная база</h2><p>Одна точка для сохранённых деталей, расчётов, режимов и маршрутов.</p></div>
+        <div class="empty-panel"><span>▣</span><strong>Проекты появятся здесь</strong><p>Данные будут храниться локально и оставаться доступными офлайн.</p></div>
+      </section>
+
+      <section class="view simple-view" data-view="profile">
+        <div class="simple-title"><p class="eyebrow">ПРОФИЛЬ СТАНКА</p><h2>CK52PT-Y · 828D</h2><p>Общие параметры станка для всех модулей.</p></div>
+        <div class="profile-grid">
+          <article><small>Шпиндель</small><strong>4000 rpm</strong><span>A2-6 · 11 kW</span></article>
+          <article><small>Револьвер</small><strong>15 позиций</strong><span>BMT40 / ER25</span></article>
+          <article><small>Стойка</small><strong>828D</strong><span>ShopTurn</span></article>
+          <article><small>Оси</small><strong>X / Z / Y / C</strong><span>единый профиль</span></article>
+        </div>
+      </section>
     </main>
+
+    <nav class="dock" aria-label="Главная навигация">
+      <button class="dock-item is-active" data-route="home" type="button"><span class="dock-icon home-icon"></span><small>Главная</small></button>
+      <button class="dock-item" data-route="tools" type="button"><span class="dock-icon tool-icon"></span><small>Инструмент</small></button>
+      <button class="dock-item" data-route="projects" type="button"><span class="dock-icon project-icon"></span><small>Проекты</small></button>
+      <button class="dock-item" data-route="profile" type="button"><span class="dock-icon profile-icon"></span><small>Профиль</small></button>
+    </nav>
   </div>
-  <script src="./app.js?v=3.4.0" defer></script>
-  <script src="./enhancements.js?v=3.4.0" defer></script>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
 </body>
 </html>
