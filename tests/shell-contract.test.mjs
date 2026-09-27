@@ -64,7 +64,7 @@ test('approved material cards are real WebP files and cached offline',()=>{
 });
 
 test('critical native modules are part of offline app shell',()=>{
-  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/modes-data.mjs','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs','./modules/profile.css','./modules/profile.js','./modules/module-registry.mjs','./modules/machine-store.mjs','./modules/tools.css','./modules/tools.js','./modules/projects.css','./modules/projects.js']){
+  for(const path of ['./modules/box.css','./modules/box.js','./modules/box-core.mjs','./modules/modes.css','./modules/modes.js','./modules/modes-data.mjs','./modules/cutcalc.css','./modules/cutcalc.js','./modules/cutcalc-core.mjs','./modules/geometry.css','./modules/geometry.js','./modules/geometry-core.mjs','./modules/copilot.css','./modules/copilot.js','./modules/copilot-core.mjs','./modules/copilot-materials.mjs','./modules/copilot-data.js','./modules/codes.css','./modules/codes.js','./modules/codes-data.mjs','./modules/profile.css','./modules/profile.js','./modules/module-registry.mjs','./modules/machine-store.mjs','./modules/tools.css','./modules/tools.js','./modules/projects.css','./modules/projects.js','./modules/workspace-store.mjs','./modules/workflow.css','./modules/workflow.js']){
     assert.ok(sw.includes(path),`Missing offline cache entry: ${path}`);
   }
 });
@@ -107,4 +107,32 @@ test('shell uses central module registry and shared machine store',()=>{
   assert.match(copilot,/machine-store\.mjs/);
   assert.doesNotMatch(profile,/localStorage\.getItem\(['"]cncFullMachineV1/);
   assert.doesNotMatch(copilot,/localStorage\.getItem\(['"]cncFullMachineV1/);
+});
+
+
+test('unified workflow is wired into shell and offline cache',()=>{
+  assert.match(index,/data-view="workflow"/);
+  assert.match(index,/id="workflowTitle"/);
+  assert.match(index,/id="homeWorkflowRing"/);
+  assert.match(index,/modules\/workflow\.css/);
+  assert.match(index,/modules\/workflow\.js/);
+  for(const path of ['./modules/workspace-store.mjs','./modules/workflow.css','./modules/workflow.js']){
+    assert.ok(sw.includes(path),`Missing workflow offline cache entry: ${path}`);
+  }
+});
+
+test('production modules publish results into active workspace',()=>{
+  const geometry=fs.readFileSync('modules/geometry.js','utf8');
+  const cutcalc=fs.readFileSync('modules/cutcalc.js','utf8');
+  const box=fs.readFileSync('modules/box.js','utf8');
+  const modes=fs.readFileSync('modules/modes.js','utf8');
+  const tools=fs.readFileSync('modules/tools.js','utf8');
+  const copilot=fs.readFileSync('modules/copilot.js','utf8');
+
+  assert.match(geometry,/workspace-store\.mjs/);
+  assert.match(cutcalc,/workspace-store\.mjs/);
+  assert.match(box,/workspace-store\.mjs/);
+  assert.match(modes,/workspace-store\.mjs/);
+  assert.match(tools,/workspace-store\.mjs/);
+  assert.match(copilot,/workspace-store\.mjs/);
 });
