@@ -144,3 +144,20 @@ test('Copilot does not overwrite workspace during boot',()=>{
   assert.match(copilot,/if\(state\.workspaceSyncReady\)syncWorkspaceRoute\(\)/);
   assert.match(copilot,/state\.workspaceSyncReady=true/);
 });
+
+
+test('service worker prevents mixed shell versions in Safari',()=>{
+  assert.match(sw,/const VERSION = '1\.0\.2'/);
+  assert.match(sw,/async function freshFirst/);
+  assert.match(sw,/cache:\s*'reload'/);
+  assert.match(sw,/request\.destination === 'script'/);
+  assert.match(sw,/request\.destination === 'style'/);
+  assert.match(index,/serviceWorker\.addEventListener\('controllerchange'/);
+  assert.match(index,/location\.reload\(\)/);
+});
+
+test('production modules never fall back to placeholder view',()=>{
+  const app=fs.readFileSync('app.js','utf8');
+  assert.doesNotMatch(app,/setActiveView\('module'\)/);
+  assert.match(app,/CNC module view is missing/);
+});
