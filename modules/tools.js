@@ -13,6 +13,27 @@
   function filtered(){const q=state.query.toLowerCase();return all().filter(t=>(state.iso==='all'||(t.iso||[]).includes(state.iso))&&(!q||[t.insert,t.holder,t.grade,t.breaker,t.location,t.source].join(' ').toLowerCase().includes(q)))}
   function stats(){const l=local();$('toolsCount').textContent=all().length;$('toolsLocalCount').textContent=l.length;$('toolsQty').textContent=l.reduce((n,t)=>n+(Number(t.quantity)||0),0)}
   function art(card,t){const host=card.querySelector('.tool-card-art'),src=t.photos?.front||t.photos?.box||'';if(src){const img=new Image();img.alt='';img.src=src;host.appendChild(img)}else{const shape=document.createElement('span');shape.className='insert-shape';host.appendChild(shape)}}
+  async function useTool(t,button){
+    try{
+      const {updateWorkspace}=await import('./workspace-store.mjs');
+      updateWorkspace({
+        tool:{
+          id:t.id||'',
+          holder:t.holder||'',
+          insert:t.insert||'',
+          grade:t.grade||'',
+          breaker:t.breaker||'',
+          nose:t.nose??null,
+          iso:t.iso||[],
+          ops:t.ops||[],
+          source:t.source||'',
+          location:t.location||''
+        }
+      },{source:'tools'});
+      if(button){const old=button.textContent;button.textContent='✓ В работе';setTimeout(()=>button.textContent=old,1300)}
+    }catch{}
+  }
+
   function render(){
     stats();const root=$('toolsGrid');root.innerHTML='';const rows=filtered();
     if(!rows.length){root.innerHTML='<div class="tools-empty"><span>◇</span><strong>Ничего не найдено</strong><p>Сбрось фильтр или добавь свою пластину/державку.</p></div>';return}
@@ -21,7 +42,8 @@
       card.innerHTML=`<div class="tool-card-art"></div><div class="tool-card-copy"><small>${isLocal?'МОЙ ШКАФ':'КАТАЛОГ'}</small><strong></strong><span class="tool-desc"></span><div class="tool-card-meta"></div></div><div class="tool-card-actions"></div>`;
       card.querySelector('strong').textContent=t.insert||'Инструмент';card.querySelector('.tool-desc').textContent=(t.holder||'Державка не указана')+' · '+(t.grade||'grade —')+' · '+(t.breaker||'стружколом —');
       const meta=card.querySelector('.tool-card-meta');for(const s of [...(t.iso||[]).map(x=>'ISO '+x),...(isLocal?[String(t.quantity||0)+' шт',t.location||'без ячейки']:[])]){const i=document.createElement('i');i.textContent=s;meta.appendChild(i)}
-      if(isLocal){const edit=document.createElement('button');edit.type='button';edit.textContent='✎';edit.onclick=()=>openForm(t);card.querySelector('.tool-card-actions').appendChild(edit)}
+      const use=document.createElement('button');use.type='button';use.className='use-workflow';use.textContent='В работу';use.title='Использовать в текущей детали';use.onclick=()=>useTool(t,use);card.querySelector('.tool-card-actions').appendChild(use);
+      if(isLocal){const edit=document.createElement('button');edit.type='button';edit.textContent='✎';edit.title='Редактировать';edit.onclick=()=>openForm(t);card.querySelector('.tool-card-actions').appendChild(edit)}
       art(card,t);root.appendChild(card);
     })
   }
