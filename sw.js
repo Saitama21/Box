@@ -1,4 +1,4 @@
-const VERSION = '1.2.0';
+const VERSION = '1.2.1';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -47,7 +47,7 @@ const APP_SHELL = [
   './assets/cutcalc/rod-steel.webp',
   './assets/modes/card-aisi304.webp',
   './assets/modes/card-steel.webp',
-  './assets/modes/card-polyamide.webp',
+  './assets/modes/card-polyamide.webp?v=20260927-1',
   './assets/modes/card-brass.webp',
   './manifest.webmanifest',
   './.nojekyll'
