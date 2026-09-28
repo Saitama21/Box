@@ -1,0 +1,11 @@
+{
+  "name": "ProstoPay — быстрый доступ",
+  "short_name": "ProstoPay",
+  "description": "Быстрый переход к странице оплаты ProstoPay",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff8f9",
+  "theme_color": "#fff8f9",
+  "lang": "ru"
+}
