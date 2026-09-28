@@ -1,4 +1,4 @@
-const VERSION = '1.2.1';
+const VERSION = '1.2.2';
 const CACHE_PREFIX = 'cnc-suite-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 
@@ -66,7 +66,10 @@ self.addEventListener('activate', event => {
     caches.keys()
       .then(keys => Promise.all(
         keys
-          .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE)
+          .filter(key =>
+            (key.startsWith(CACHE_PREFIX) && key !== CACHE) ||
+            key.startsWith('prostopay-quick-')
+          )
           .map(key => caches.delete(key))
       ))
       .then(() => self.clients.claim())
