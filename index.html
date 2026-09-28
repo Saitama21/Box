@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#fff7f8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="ProstoPay" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>ProstoPay — быстрый доступ</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <div class="ambient" aria-hidden="true">
+      <i class="orb orb-a"></i>
+      <i class="orb orb-b"></i>
+      <i class="orb orb-c"></i>
+    </div>
+
+    <header class="topbar">
+      <div class="brand" aria-label="ProstoPay"><span>Prosto</span><strong>Pay</strong></div>
+      <button class="icon-btn" id="shareButton" type="button" aria-label="Поделиться ссылкой"><span aria-hidden="true">↗</span></button>
+    </header>
+
+    <section class="hero" aria-labelledby="title">
+      <p class="eyebrow">БЫСТРЫЙ ДОСТУП</p>
+      <h1 id="title">Оплата<br />в один тап</h1>
+      <p class="lead">Одна кнопка — и сразу страница оплаты ProstoPay.</p>
+
+      <a class="pay-button" id="payButton" href="https://pay.prostopay.net/40133634/select" aria-label="Открыть оплату ProstoPay">
+        <canvas id="liquidCanvas" class="liquid-canvas" aria-hidden="true"></canvas>
+        <span class="pay-content" aria-hidden="true">
+          <span class="scan-icon">
+            <i></i><i></i><i></i><i></i>
+            <b class="sq s1"></b><b class="sq s2"></b><b class="sq s3"></b><b class="sq s4"></b>
+          </span>
+          <span class="pay-label">Открыть<br />оплату</span>
+          <span class="pay-arrow">→</span>
+        </span>
+      </a>
+
+      <div class="security-card">
+        <div class="wallet-icon" aria-hidden="true">▣</div>
+        <div><strong>Быстрый и безопасный</strong><span>переход к странице оплаты</span></div>
+        <span class="chevron" aria-hidden="true">›</span>
+      </div>
+    </section>
+
+    <p class="footnote">Для оплаты потребуется интернет-соединение.</p>
+    <div class="toast" id="toast" role="status" aria-live="polite">Ссылка скопирована</div>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
