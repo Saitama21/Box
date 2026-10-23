@@ -1,5 +1,5 @@
 /* Network-first application shell: fresh themes when online, full offline fallback. */
-const CACHE='cnc-thread-drill-v4-concept-20261023';
+const CACHE='cnc-thread-drill-v4-concept-20261023-final';
 const CORE=['./','./index.html','./styles.css','./themes.css','./concepts.css','./app.js','./data.js','./manifest.webmanifest','./icons/favicon.svg','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png','./assets/twist-drill.webp','./assets/threaded-bore.webp','./assets/cutting-tap.webp'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));

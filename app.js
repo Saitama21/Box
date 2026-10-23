@@ -243,7 +243,7 @@ const THEMES = [
   {id:'steel',name:'Brushed Steel',desc:'Шлифованная нержавеющая сталь',icon:'▤'}
 ];
 function showSettings() {
-  openModal('Настройки оформления',`<p class="theme-modal-lead">Версия 3.1 · 5 тем. Выбери оформление — оно сохранится и будет доступно без интернета.</p>
+  openModal('Настройки оформления',`<p class="theme-modal-lead">Версия 4.0 · 5 оригинальных тем. Выбери оформление — оно сохранится и будет доступно без интернета.</p>
     <div class="theme-picker" id="theme-picker" role="radiogroup" aria-label="Тема приложения"></div>
     <h3>Текущие параметры</h3>
     <div class="stat-chip"><span id="current-selection">${fullLabel(state.d,state.p)}</span><b>Ø ${num(drillFor(state.d,state.p).diameter)} мм</b></div>
