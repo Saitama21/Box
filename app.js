@@ -305,7 +305,7 @@ async function registerOffline() {
     await navigator.serviceWorker.register('./sw.js',{scope:'./'});
     await navigator.serviceWorker.ready;
     const keys=await caches.keys();
-    offlineReady=keys.some(key=>key.startsWith('cnc-thread-drill-v2-'));
+    offlineReady=keys.some(key=>key.startsWith('cnc-thread-drill-v3-'));
     networkState();
   }
   catch {$('online-status').textContent='OFFLINE ПОСЛЕ HTTPS';}
