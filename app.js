@@ -5,7 +5,7 @@ const {THREADS, POPULAR, findThread, drillFor} = window.CNC_THREAD_DATA;
 const $ = id => document.getElementById(id);
 const $grid = $('thread-grid');
 const state = { tab:'common', d:10, p:1.5, theme:'blueprint', modal:null, opener:null, page:0 };
-const PAGE_SIZE = 16;
+const gridPageSize=()=>({gold:15,orange:15,green:15,blueprint:14,steel:12})[state.theme]||14;
 const FINE_SIZES = [3,4,5,6,8,10,12,14,16,18,20,22,24,27,30,33,36];
 const num = n => Number(n).toLocaleString('en-US', {maximumFractionDigits:2, useGrouping:false});
 const label = n => `M${num(n)}`;
@@ -30,6 +30,8 @@ function setTheme(theme) {
   state.theme = theme;
   document.body.dataset.theme=theme;
   document.querySelector('meta[name="theme-color"]').content = ({blueprint:'#061b38',gold:'#10100e',orange:'#101010',green:'#051510',steel:'#bcc1c4'})[theme] || '#061b38';
+  state.page=0;
+  updateTabs();drawGrid();drawResult();
   persist();
 }
 function sizesFor(tab) {
@@ -44,14 +46,14 @@ function updateTabs() {
     btn.setAttribute('aria-selected',String(selected));
   });
   $('list-caption').textContent= state.tab==='fine'?'ВЫБЕРИ РАЗМЕР ДЛЯ МЕЛКОГО ШАГА':state.tab==='other'?'ДОПОЛНИТЕЛЬНЫЕ РАЗМЕРЫ':'ВЫБЕРИ РАЗМЕР РЕЗЬБЫ';
-  const pageTotal=Math.ceil(sizesFor(state.tab).length/PAGE_SIZE);
+  const pageTotal=Math.ceil(sizesFor(state.tab).length/gridPageSize());
   $('all-sizes').textContent=pageTotal>1?`Далее ${state.page+1}/${pageTotal} →`:'Все размеры ↗';
 }
 function drawGrid() {
   const fragment=document.createDocumentFragment();
   const choices=sizesFor(state.tab);
-  state.page=Math.min(state.page,Math.max(0,Math.ceil(choices.length/PAGE_SIZE)-1));
-  for(const d of choices.slice(state.page*PAGE_SIZE,(state.page+1)*PAGE_SIZE)) {
+  state.page=Math.min(state.page,Math.max(0,Math.ceil(choices.length/gridPageSize())-1));
+  for(const d of choices.slice(state.page*gridPageSize(),(state.page+1)*gridPageSize())) {
     const b=document.createElement('button');
     b.type='button';b.className='thread-btn';b.dataset.size=String(d);
     b.textContent=label(d);
@@ -74,7 +76,7 @@ function setTab(tab) {
   } else if(tab==='common' && !POPULAR.includes(state.d)) {
     const item=findThread(10);state.d=item.d;state.p=item.coarse;
   }
-  state.page=Math.max(0,Math.floor(sizesFor(tab).indexOf(state.d)/PAGE_SIZE));
+  state.page=Math.max(0,Math.floor(sizesFor(tab).indexOf(state.d)/gridPageSize()));
   updateTabs();drawGrid();drawResult();persist();
 }
 function selectThread(d, requestedPitch) {
@@ -85,7 +87,7 @@ function selectThread(d, requestedPitch) {
     ? Number(requestedPitch)
     : (state.tab==='fine'&&item.fine.length?item.fine[0]:item.coarse);
   if(!sizesFor(state.tab).includes(item.d)) state.tab=POPULAR.includes(item.d)?'common':'other';
-  state.page=Math.max(0,Math.floor(sizesFor(state.tab).indexOf(state.d)/PAGE_SIZE));
+  state.page=Math.max(0,Math.floor(sizesFor(state.tab).indexOf(state.d)/gridPageSize()));
   updateTabs();drawGrid();drawResult();persist();
 }
 function selectPitch(p) {
@@ -113,7 +115,7 @@ function drawResult() {
   $('pitch-list').replaceChildren(frag);
   $('drill-diameter').textContent=num(result.diameter);
   $('diagram-bore').textContent=`Ø ${num(result.diameter)}`;
-  $('diagram-drill').textContent=`Ø ${num(result.diameter)}`;
+  $('diagram-drill').textContent=`Ø ${num(result.diameter)}`;const hero=$('hero-diameter');if(hero)hero.textContent=`Ø ${num(result.diameter)}`;
   $('diagram-thread').textContent=`M${num(state.d)}×${num(state.p)}`;
   $('diagram-pitch').textContent=`P = ${num(state.p)}`;
   $('spec-pitch').textContent=`${num(state.p)} мм`;
@@ -284,7 +286,7 @@ function clearSelection() {
 function initEvents() {
   document.querySelectorAll('.mode-tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
   $('all-sizes').addEventListener('click',()=>{
-    const pages=Math.ceil(sizesFor(state.tab).length/PAGE_SIZE);
+    const pages=Math.ceil(sizesFor(state.tab).length/gridPageSize());
     if(pages>1){state.page=(state.page+1)%pages;updateTabs();drawGrid();}
     else setTab('other');
   });

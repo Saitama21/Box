@@ -1,0 +1,197 @@
+
+/* v4 Visual fidelity: five different compositions, one shared logic; header in flow and fixed dock */
+.app-shell{height:auto;min-height:100dvh;overflow:visible;isolation:auto;position:relative;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+.bottom-dock{position:fixed;left:50%;transform:translateX(-50%);bottom:2px;width:87%;height:68px;max-width:580px}
+.topbar{isolation:auto;position:relative;top:auto;backdrop-filter:none;-webkit-backdrop-filter:none}
+.concept-hero{display:none;position:relative;overflow:hidden;pointer-events:none}
+.hero-copy,.hero-stage{position:absolute}.hero-copy b,.hero-copy strong{display:block;font-weight:900}.hero-copy p{font-size:11px;line-height:1.35;margin:7px 0;color:#c1c3c5}
+.hero-stage{top:0;right:0;height:100%;color:var(--t-accent2);width:42%;background:linear-gradient(var(--t-grid) 1px,transparent 1px),linear-gradient(90deg,var(--t-grid) 1px,transparent 1px);background-size:20px 20px}
+.hero-stage img{position:absolute;object-fit:contain;filter:drop-shadow(0 4px 9px #000b)}.hero-stage svg{position:absolute;inset:0;width:100%;height:100%;opacity:.7}
+.result-tool-photo{display:none}.result-heading{z-index:2}.result-visual,.result-readout,.engineering-figure{min-width:0;min-height:0}.result-card{overflow:hidden}.engineering-figure .schematic-main{overflow:visible}
+.spec-list strong,.spec-list span{line-height:1.25}.result-visual{grid-template-columns:minmax(0,53%) minmax(0,47%)}
+/* Gold Premium — charcoal, gilded contour, serif typesetting, 5-column selector */
+body[data-theme=gold]{background:radial-gradient(ellipse at 50% 5%,#272018,#111111 38%,#08090b 100%);--t-text:#f3eee8;--t-muted:#aaa4a0}
+body[data-theme=gold] .topbar{min-height:76px;margin-bottom:12px}
+body[data-theme=gold] .brand-mark{width:45px;height:59px;filter:drop-shadow(0 0 6px #ebc17d80)}
+body[data-theme=gold] .brand-kicker,body[data-theme=gold] .top-meta{display:none}
+body[data-theme=gold] .brand-titles h1{font-family:Georgia,serif;font-size:clamp(22px,5.9vw,34px);font-weight:500;color:#f2dbb4;letter-spacing:-.035em}
+body[data-theme=gold] .brand-titles h1 span{color:#f3e4c8}
+body[data-theme=gold] .brand-titles p{color:#a7a3a0!important;font-size:12px!important}
+body[data-theme=gold] .top-actions .icon-action:first-child{display:none}
+body[data-theme=gold] .icon-action{border:1px solid #897045;border-radius:50%;color:#f2d49b;width:34px}
+body[data-theme=gold] .mode-switch{height:43px;border-radius:14px;background:linear-gradient(#29251e,#141313)}
+body[data-theme=gold] .mode-tab.active{background:linear-gradient(140deg,#ead1a1,#87643f);color:#29180b;box-shadow:0 0 12px #d6a05c66}
+body[data-theme=gold] .step-number{display:none}
+body[data-theme=gold] .selection-caption,body[data-theme=gold] .pitch-label-line{font-size:12px;letter-spacing:0;font-weight:500}
+body[data-theme=gold] .thread-grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));height:clamp(119px,18dvh,151px);gap:6px}
+body[data-theme=gold] .thread-btn{font-weight:500;font-size:clamp(13px,3.8vw,20px);border-radius:9px;border-color:#484645;background:linear-gradient(#252423,#111213)}
+body[data-theme=gold] .thread-btn.selected{background:linear-gradient(#51412e,#28221b);color:#f7dbab;box-shadow:inset 0 1px #e2bf86,0 0 12px #d6a05b69}
+body[data-theme=gold] .pitch-section{margin-top:10px}
+body[data-theme=gold] .pitch-btn{height:38px;min-width:42px;border-radius:10px;font-size:13px}
+body[data-theme=gold] .pitch-btn.selected{background:linear-gradient(#615039,#342b22);color:#f4d4a2;box-shadow:0 0 11px #c69b58aa}
+body[data-theme=gold] .result-card{margin-top:14px;padding:12px;border:1px solid #846d4a;border-radius:20px;background:linear-gradient(145deg,#211d19,#0a0b0c 70%);box-shadow:0 7px 30px #0009}
+body[data-theme=gold] .result-overline{color:#c8baab;font-size:12px;letter-spacing:0}
+body[data-theme=gold] .tiny-accent{display:none}
+body[data-theme=gold] .result-heading h2{font-family:Georgia,serif;color:#f3dcba;font-weight:500;font-size:clamp(29px,7.7vw,45px)}
+body[data-theme=gold] .result-heading h2 .highlight{color:#f0e9de}
+body[data-theme=gold] .drill-title{font-size:11px;letter-spacing:0}
+body[data-theme=gold] .drill-value{color:#f2d49b;text-shadow:0 0 14px #b3864c66}
+body[data-theme=gold] .drill-value strong{font-family:Georgia,serif;font-size:clamp(38px,10.5vw,57px);font-weight:600}
+body[data-theme=gold] .engineering-figure{color:#d0b991}
+body[data-theme=gold] .technical-panels{display:none}
+body[data-theme=gold] .result-note{background:#141313;border:1px solid #5f4a36;border-radius:10px;color:#bab1a6}
+body[data-theme=gold] .bottom-dock{background:linear-gradient(#191818,#090909);border:1px solid #564636;border-radius:24px}
+body[data-theme=gold] .dock-button.active{background:transparent;border:0;box-shadow:none;color:#f2cb88}
+/* Orange Industrial — large top-left title and machining illustration */
+body[data-theme=orange]{background:radial-gradient(ellipse at 84% 0,#221c1a,#080a0c 48%)}
+body[data-theme=orange] .topbar{position:absolute;right:11px;top:calc(12px + env(safe-area-inset-top,0px));width:33px;min-height:0;height:34px;margin:0;z-index:3}
+body[data-theme=orange] .brand-mark,body[data-theme=orange] .brand-titles,body[data-theme=orange] .top-actions .icon-action:first-child,body[data-theme=orange] .top-meta{display:none}
+body[data-theme=orange] .concept-hero{display:block;height:clamp(112px,15.4dvh,133px);margin-bottom:6px}
+body[data-theme=orange] .hero-copy{left:1px;top:3px;width:60%}
+body[data-theme=orange] .hero-copy b{font-size:clamp(28px,8vw,42px);line-height:1.02;color:white;letter-spacing:-.055em}
+body[data-theme=orange] .hero-copy strong{color:#ff752d;font-size:clamp(31px,8.8vw,48px);line-height:1.0;letter-spacing:-.045em}
+body[data-theme=orange] .hero-stage{color:#aaaeb0}
+body[data-theme=orange] .hero-stage .hero-tap{height:63%;top:33%;right:22%;filter:grayscale(1) drop-shadow(0 0 5px #9996)}
+body[data-theme=orange] .hero-stage .hero-drill{height:80%;right:43%;top:-33%;filter:grayscale(1)}
+body[data-theme=orange] .mode-switch{height:40px;border-radius:6px}
+body[data-theme=orange] .mode-tab.active{background:#ff782b;color:#160e09;box-shadow:0 0 11px #ff662a69}
+body[data-theme=orange] .thread-grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));height:clamp(116px,18dvh,148px);gap:6px}
+body[data-theme=orange] .thread-btn{font-size:clamp(13px,3.7vw,19px);font-weight:550;border-radius:6px;background:#101112;border-color:#444}
+body[data-theme=orange] .thread-btn.selected,body[data-theme=orange] .pitch-btn.selected{background:#ff762b;color:#1c1009;box-shadow:0 0 10px #ff753388}
+body[data-theme=orange] .pitch-section{margin-top:8px}
+body[data-theme=orange] .result-card{margin-top:11px;padding:10px;border-radius:15px;background:linear-gradient(#131516,#060708);border-color:#594639}
+body[data-theme=orange] .result-heading h2{font-size:clamp(31px,8.5vw,48px);font-weight:900}
+body[data-theme=orange] .drill-value{color:#ff792c}
+body[data-theme=orange] .drill-value strong{font-size:clamp(39px,10.7vw,58px);font-weight:950}
+body[data-theme=orange] .engineering-figure{color:#b9b9b9}
+body[data-theme=orange] .technical-panels{display:none}
+body[data-theme=orange] .result-note{background:#101112;border-color:#4a3b31}
+body[data-theme=orange] .bottom-dock{background:#0a0c0d;border-radius:16px;border-color:#393c3f}
+body[data-theme=orange] .dock-button.active{background:transparent;border:0;box-shadow:none;color:#ff782c}
+/* Neon Green — large tool hero, grid and glowing result */
+body[data-theme=green]{background:radial-gradient(ellipse at 40% 0,#142e20,#030b09 65%)}
+body[data-theme=green] .topbar{min-height:67px;margin-bottom:0}
+body[data-theme=green] .brand-mark,body[data-theme=green] .brand-kicker,body[data-theme=green] .top-meta,body[data-theme=green] .top-actions .icon-action:first-child{display:none}
+body[data-theme=green] .brand-titles h1{font-size:clamp(23px,6.3vw,35px);font-weight:850}
+body[data-theme=green] .brand-titles p{font-size:12px!important}
+body[data-theme=green] .concept-hero{display:block;height:clamp(89px,12dvh,107px);margin-bottom:7px;background:radial-gradient(ellipse at center,#132b1a,#061008 65%);border-bottom:1px solid #244533}
+body[data-theme=green] .hero-copy{display:none}
+body[data-theme=green] .hero-stage{left:0;width:100%;color:#58fa9b}
+body[data-theme=green] .hero-stage .hero-tap{height:89%;left:17%;top:3%;transform:rotate(90deg);filter:drop-shadow(0 0 8px #35dc8190)}
+body[data-theme=green] .hero-stage .hero-drill{height:108%;right:16%;top:-10%;transform:rotate(90deg);filter:drop-shadow(0 0 8px #35dc8190)}
+body[data-theme=green] .hero-stage svg{left:25%;top:12%;width:50%;height:80%}
+body[data-theme=green] .mode-tab.active{background:#57ff98;color:#0c2417}
+body[data-theme=green] .thread-grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));height:clamp(115px,17dvh,137px);gap:5px}
+body[data-theme=green] .thread-btn{font-size:clamp(12px,3.5vw,19px);font-weight:500}
+body[data-theme=green] .thread-btn.selected,body[data-theme=green] .pitch-btn.selected{background:#12472c;color:#b8ffda;box-shadow:0 0 0 1px #60ffaa,0 0 14px #32f77b88}
+body[data-theme=green] .pitch-section{margin-top:7px}
+body[data-theme=green] .result-card{margin-top:10px;border-radius:17px;background:linear-gradient(145deg,#092115,#031009);border-color:#4aff91;box-shadow:0 0 14px #22ed7377,inset 0 0 16px #32f8781e}
+body[data-theme=green] .result-heading h2{font-size:clamp(29px,8vw,47px)}
+body[data-theme=green] .drill-value{color:#63ffa1;text-shadow:0 0 15px #4aff8750}
+body[data-theme=green] .drill-value strong{font-size:clamp(40px,11vw,58px)}
+body[data-theme=green] .engineering-figure{color:#a1ffbf}
+body[data-theme=green] .technical-panels,body[data-theme=green] .result-note{display:none}
+body[data-theme=green] .bottom-dock{background:#06130d;border:1px solid #254937;border-radius:22px}
+body[data-theme=green] .dock-button.active{background:transparent;border:0;box-shadow:none;color:#62ffa3}
+/* Blueprint Pro — compact 7x2 selector and oversized illustrated technical board */
+body[data-theme=blueprint]{background-image:linear-gradient(#2b568043 1px,transparent 1px),linear-gradient(90deg,#2b568043 1px,transparent 1px),linear-gradient(140deg,#04172d,#082d54);background-size:24px 24px,24px 24px,100% 100%}
+body[data-theme=blueprint] .topbar{min-height:57px;margin-bottom:12px}
+body[data-theme=blueprint] .brand-mark,body[data-theme=blueprint] .brand-kicker,body[data-theme=blueprint] .top-meta,body[data-theme=blueprint] .top-actions .icon-action:first-child{display:none}
+body[data-theme=blueprint] .brand-titles h1{font-weight:860;font-size:clamp(25px,6.7vw,38px)}
+body[data-theme=blueprint] .brand-titles h1 span{color:#d2efff}
+body[data-theme=blueprint] .brand-titles p{color:#bbdafa!important;font-size:12px!important}
+body[data-theme=blueprint] .mode-switch{border-radius:5px;height:38px}
+body[data-theme=blueprint] .mode-tab.active{background:linear-gradient(#16a6f5,#007cce);color:#f7ffff}
+body[data-theme=blueprint] .thread-grid{grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));height:clamp(84px,11.8dvh,106px);gap:4px}
+body[data-theme=blueprint] .thread-btn{font-weight:500;font-size:clamp(10px,3.2vw,18px);border-radius:4px}
+body[data-theme=blueprint] .thread-btn.selected{background:#11539a;box-shadow:0 0 10px #13baffaa;color:white}
+body[data-theme=blueprint] .pitch-section{margin-top:12px}
+body[data-theme=blueprint] .pitch-btn{border-radius:3px}
+body[data-theme=blueprint] .pitch-btn.selected{background:#125baa;box-shadow:0 0 10px #2bc1ff8a}
+body[data-theme=blueprint] .result-card{margin-top:12px;border:1px solid #54b6ff;border-radius:2px;padding:11px;background:#052146b5;box-shadow:inset 0 0 0 2px #184b7b}
+body[data-theme=blueprint] .result-overline{font-size:10px;letter-spacing:.03em}
+body[data-theme=blueprint] .result-heading h2{font-weight:900;font-size:clamp(33px,9vw,54px)}
+body[data-theme=blueprint] .result-heading h2 .highlight{color:#eef9ff}
+body[data-theme=blueprint] .drill-title{color:#c1e4ff;font-size:11px}
+body[data-theme=blueprint] .drill-value{align-self:flex-start;display:inline-flex;padding:5px 8px;background:#07509e70;border:1px solid #41b9ff;box-shadow:0 0 11px #118fff70;border-radius:5px}
+body[data-theme=blueprint] .drill-value strong{font-weight:900;font-size:clamp(40px,11vw,59px)}
+body[data-theme=blueprint] .spec-list{display:none}
+body[data-theme=blueprint] .technical-panels{display:grid;grid-template-columns:1fr 1fr;flex-basis:clamp(85px,12dvh,107px);gap:5px}
+body[data-theme=blueprint] .technical-plate{border-radius:1px}
+body[data-theme=blueprint] .result-note{display:none}
+body[data-theme=blueprint] .bottom-dock{border:1px solid #2f91cd;background:#041b3a;border-radius:20px}
+body[data-theme=blueprint] .dock-button.active{background:transparent;border:0;color:#40d1ff;box-shadow:none}
+/* Brushed Steel — actual metal textures, embossed buttons, photographic thread */
+body[data-theme=steel]{background:linear-gradient(135deg,#b1b8bc,#e1e4e5 32%,#9ba4a9 78%,#d0d4d6);--t-text:#101418;--t-muted:#39434a}
+body[data-theme=steel] .app-shell{padding-left:9px;padding-right:9px}
+body[data-theme=steel] .topbar{min-height:84px;padding:8px;margin-bottom:9px;border-radius:19px;border:1px solid #7c8388;background:repeating-linear-gradient(92deg,#ffffff24 0px,#0000000a 1px,transparent 3px,transparent 6px),linear-gradient(145deg,#dfe3e6,#aab2b7 55%,#dfe2e4);box-shadow:inset 0 1px #fff9,0 4px 11px #0004}
+body[data-theme=steel] .brand-mark,body[data-theme=steel] .brand-kicker,body[data-theme=steel] .top-meta,body[data-theme=steel] .top-actions .icon-action:first-child{display:none}
+body[data-theme=steel] .brand-titles{text-align:center}
+body[data-theme=steel] .brand-titles h1{font-weight:950;color:#12171a;text-shadow:0 1px #fff8;font-size:clamp(22px,6vw,35px)}
+body[data-theme=steel] .brand-titles h1 span{color:#111}
+body[data-theme=steel] .brand-titles p{font-size:12px!important;color:#313c42!important}
+body[data-theme=steel] .icon-action{color:#252b2f}
+body[data-theme=steel] .mode-switch{display:none}
+body[data-theme=steel] .selector,body[data-theme=steel] .pitch-section{padding:9px;border-radius:18px;border:1px solid #79838b;background:linear-gradient(140deg,#cdd1d4,#9da7ad 55%,#d9dcdf);box-shadow:inset 0 1px #fff9,0 5px 13px #0003}
+body[data-theme=steel] .step-number{display:none}
+body[data-theme=steel] .selection-caption{color:#10191d}
+body[data-theme=steel] .thread-grid{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));height:clamp(78px,11dvh,102px);gap:6px}
+body[data-theme=steel] .thread-btn,body[data-theme=steel] .pitch-btn{border-radius:9px;background:linear-gradient(#e8ecee,#aab4b9);border:1px solid #818c93;box-shadow:inset 0 1px #fff9,0 3px 4px #0003;color:#15191b;font-weight:650}
+body[data-theme=steel] .thread-btn{font-size:clamp(12px,3.25vw,18px)}
+body[data-theme=steel] .thread-btn.selected,body[data-theme=steel] .pitch-btn.selected{background:linear-gradient(#42494f,#0d1013);color:#ffe4a7;box-shadow:0 0 0 2px #ffc977,0 0 8px #eab76099}
+body[data-theme=steel] .pitch-section{margin-top:9px}
+body[data-theme=steel] .pitch-label-line{color:#172127}
+body[data-theme=steel] .pitch-label-line span:last-child{color:#36444b}
+body[data-theme=steel] .result-card{margin-top:9px;border-radius:18px;border:1px solid #858d92;background:linear-gradient(135deg,#e4e7e8,#b7c0c5 48%,#d8dcdf);box-shadow:inset 0 1px #fff8,0 7px 12px #0004;color:#0c1012}
+body[data-theme=steel] .result-overline{font-size:13px;letter-spacing:0;color:#151b20}
+body[data-theme=steel] .result-heading h2{font-size:clamp(33px,9vw,54px);font-weight:940;color:#14191b}
+body[data-theme=steel] .result-heading h2 .highlight{color:#22282d}
+body[data-theme=steel] .drill-title{font-size:11px;letter-spacing:0;color:#161c1f}
+body[data-theme=steel] .drill-value{display:inline-flex;align-self:flex-start;padding:5px 10px;border-radius:8px;background:#161c20;color:#ffe0a0;box-shadow:inset 0 1px #fff6,0 4px 10px #0005;text-shadow:none}
+body[data-theme=steel] .drill-value strong{font-size:clamp(37px,10vw,58px)}
+body[data-theme=steel] .spec-list,body[data-theme=steel] .technical-panels,body[data-theme=steel] .result-note{display:none}
+body[data-theme=steel] .engineering-figure{color:#242a2e;border-radius:8px;background:url('./assets/threaded-bore.webp') 50% 40% / cover;filter:grayscale(1) contrast(1.1)}
+body[data-theme=steel] .engineering-figure .schematic-main{opacity:.3}
+body[data-theme=steel] .bottom-dock{background:linear-gradient(#d9dddf,#a2aab0);border:1px solid #66717a;border-radius:22px;box-shadow:inset 0 1px #fff9,0 -3px 15px #0004}
+body[data-theme=steel] .dock-button{color:#353c41}
+body[data-theme=steel] .dock-button.active{background:transparent;border:0;box-shadow:none;color:#191d20}
+/* One-screen mobile presentation; result has reserved space for full diagram */
+@media(max-width:819px){
+ .top-meta{display:none}.under-card{display:none}
+ .result-card{flex:0 0 auto}
+ .result-visual{height:clamp(115px,17dvh,160px);flex:1}
+ .engineering-figure .photo-background{display:none!important}
+ body[data-theme=gold] .result-card,body[data-theme=orange] .result-card,body[data-theme=green] .result-card{min-height:clamp(190px,28dvh,237px)}
+ body[data-theme=gold] .result-visual,body[data-theme=orange] .result-visual,body[data-theme=green] .result-visual{height:clamp(131px,18dvh,165px)}
+ body[data-theme=gold] .spec-list,body[data-theme=orange] .spec-list,body[data-theme=green] .spec-list{display:none}
+ body[data-theme=gold] .result-readout,body[data-theme=orange] .result-readout,body[data-theme=green] .result-readout{justify-content:center;gap:9px}
+ body[data-theme=gold] .result-tool-photo,body[data-theme=green] .result-tool-photo{display:block;position:absolute;z-index:1;pointer-events:none;right:16%;top:23px;height:105px;width:34px;opacity:.8}
+ .result-tool-photo img{height:100%;width:100%;object-fit:contain;filter:drop-shadow(0 4px 8px #000)}
+ body[data-theme=blueprint] .result-card{min-height:clamp(305px,42dvh,362px)}
+ body[data-theme=blueprint] .result-visual{height:clamp(105px,16dvh,155px)}
+ body[data-theme=blueprint] .result-readout{justify-content:center}
+ body[data-theme=steel] .result-card{min-height:clamp(237px,33dvh,300px)}
+ body[data-theme=steel] .result-visual{height:clamp(132px,19dvh,180px)}
+ body[data-theme=steel] .result-tool-photo{display:block;position:absolute;pointer-events:none;right:19%;top:15%;width:12%;height:36%}
+ body[data-theme=steel] .result-tool-photo img{filter:grayscale(1) drop-shadow(0 2px 3px #0007)}
+}
+@media(max-width:365px),(max-height:690px){
+ body[data-theme=gold] .topbar{min-height:56px}
+ body[data-theme=green] .concept-hero{height:75px}
+ body[data-theme=orange] .concept-hero{height:96px}
+ body[data-theme=gold] .thread-grid,body[data-theme=orange] .thread-grid,body[data-theme=green] .thread-grid{height:106px}
+ body[data-theme=gold] .result-card,body[data-theme=orange] .result-card,body[data-theme=green] .result-card{min-height:185px}
+ body[data-theme=blueprint] .result-card{min-height:260px}
+ body[data-theme=blueprint] .technical-panels{flex-basis:70px}
+ body[data-theme=steel] .result-card{min-height:185px}
+ body[data-theme=steel] .thread-grid{height:72px}
+ .result-note{display:none!important}
+}
+@media(min-width:820px){
+ .concept-hero{display:none!important}.app-shell{max-width:1120px}
+ .main-content{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+ body[data-theme=gold] .result-visual,body[data-theme=orange] .result-visual,body[data-theme=green] .result-visual,body[data-theme=steel] .result-visual{height:auto;min-height:140px;flex:1}
+ body[data-theme=gold] .topbar,body[data-theme=steel] .topbar{min-height:68px}
+ body[data-theme=orange] .topbar{position:relative;left:auto;top:auto;margin-bottom:0;width:auto;min-height:54px;height:auto}
+ body[data-theme=orange] .brand-titles{display:block}
+}
