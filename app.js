@@ -244,28 +244,6 @@ function clearSelection() {
   // Close only the result panel. A thread tap reopens it instantly.
   $('result-card').hidden=true;
 }
-function enableAutoFadeDock() {
-  const dock=document.querySelector('.bottom-dock');
-  let idleTimer;
-  let lastActivation=0;
-  const fade=()=>{
-    clearTimeout(idleTimer);
-    idleTimer=undefined;
-    dock.classList.remove('is-awake');
-  };
-  const reveal=()=>{
-    lastActivation=performance.now();
-    dock.classList.add('is-awake');
-    clearTimeout(idleTimer);
-    idleTimer=setTimeout(fade,3600);
-  };
-  dock.addEventListener('pointerdown',reveal,{passive:true});
-  dock.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')reveal()});
-  dock.addEventListener('focusin',event=>{if(event.target.matches(':focus-visible'))reveal()});
-  dock.addEventListener('keydown',reveal);
-  document.addEventListener('scroll',()=>{if(performance.now()-lastActivation>500)fade()},{passive:true});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)fade()});
-}
 function initEvents() {
   document.querySelectorAll('.mode-tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
   $('all-sizes').addEventListener('click',()=>{
@@ -311,7 +289,7 @@ async function registerOffline() {
 // Do not reopen the PWA partway down the page: the iPhone status bar can cover the heading.
 if ('scrollRestoration' in history) history.scrollRestoration='manual';
 window.addEventListener('pageshow',()=>requestAnimationFrame(()=>window.scrollTo(0,0)));
-restore();state.page=Math.max(0,Math.floor(sizesFor(state.tab).indexOf(state.d)/PAGE_SIZE));setTheme(state.theme);updateTabs();drawGrid();drawResult();initEvents();enableAutoFadeDock();networkState();
+restore();state.page=Math.max(0,Math.floor(sizesFor(state.tab).indexOf(state.d)/PAGE_SIZE));setTheme(state.theme);updateTabs();drawGrid();drawResult();initEvents();networkState();
 window.addEventListener('online',networkState);window.addEventListener('offline',networkState);
 if(location.protocol.startsWith('http')) registerOffline();
 else $('online-status').textContent='НУЖЕН HTTPS';
