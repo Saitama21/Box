@@ -4,8 +4,8 @@
 const {THREADS, POPULAR, findThread, drillFor} = window.CNC_THREAD_DATA;
 const $ = id => document.getElementById(id);
 const $grid = $('thread-grid');
-const state = { tab:'common', d:10, p:1.5, theme:'dark', modal:null, opener:null, page:0 };
-const PAGE_SIZE=16;
+const state = { tab:'common', d:10, p:1.5, theme:'blueprint', modal:null, opener:null, page:0 };
+const PAGE_SIZE = 16;
 const FINE_SIZES = [3,4,5,6,8,10,12,14,16,18,20,22,24,27,30,33,36];
 const num = n => Number(n).toLocaleString('en-US', {maximumFractionDigits:2, useGrouping:false});
 const label = n => `M${num(n)}`;
@@ -20,7 +20,7 @@ function restore() {
       state.d=item.d;state.p=Number(saved.p);
     }
     if(['common','fine','other'].includes(saved.tab)) state.tab=saved.tab;
-    if(['light','dark'].includes(saved.theme)) state.theme=saved.theme;
+    if(['blueprint','gold','orange','green','steel'].includes(saved.theme)) state.theme=saved.theme;
   } catch { /* Storage unavailable or old format: use safe default. */ }
 }
 function persist() {
@@ -29,7 +29,7 @@ function persist() {
 function setTheme(theme) {
   state.theme = theme;
   document.body.dataset.theme=theme;
-  document.querySelector('meta[name="theme-color"]').content = theme==='light' ? '#eaf0f5' : '#0b0e12';
+  document.querySelector('meta[name="theme-color"]').content = ({blueprint:'#061b38',gold:'#10100e',orange:'#101010',green:'#051510',steel:'#bcc1c4'})[theme] || '#061b38';
   persist();
 }
 function sizesFor(tab) {
@@ -112,7 +112,10 @@ function drawResult() {
   }
   $('pitch-list').replaceChildren(frag);
   $('drill-diameter').textContent=num(result.diameter);
-  $('bore-annotation').textContent=`Ø ${num(result.diameter)}`;
+  $('diagram-bore').textContent=`Ø ${num(result.diameter)}`;
+  $('diagram-drill').textContent=`Ø ${num(result.diameter)}`;
+  $('diagram-thread').textContent=`M${num(state.d)}×${num(state.p)}`;
+  $('diagram-pitch').textContent=`P = ${num(state.p)}`;
   $('spec-pitch').textContent=`${num(state.p)} мм`;
   $('spec-major').textContent=`${num(state.d)} мм`;
   $('spec-method').textContent=result.chart?'Таблица':'D − P';
@@ -228,17 +231,38 @@ function showInfo() {
     <h3>Важное по технологии</h3><p>Значения предназначены для обычных <b>режущих метчиков</b>. Для раскатников (формирующих метчиков) отверстие обычно больше — используй таблицу конкретного производителя.</p>
     <p>Значения, рассчитанные по D − P, являются ориентировочными. Для серийной обработки, ответственных резьб и допусков 6H/7H сверяй данные производителя, чертёж и материал. Геометрические размеры не заменяют контроль резьбовым калибром.</p>
     <h3>Офлайн-режим</h3><p>После первого открытия опубликованного HTTPS-сайта приложение сохраняет свои файлы и картинки локально. Для установки на iPhone открой ссылку в Safari → «Поделиться» → «На экран Домой».</p>
-    <p class="modal-footnote">v2.0 · Не является управляющей программой ЧПУ. Перед обработкой сверяй инструмент и наладку.</p>`);
+    <p class="modal-footnote">v3.0 · Не является управляющей программой ЧПУ. Перед обработкой сверяй инструмент и наладку.</p>`);
 }
+const THEMES = [
+  {id:'blueprint',name:'Blueprint Pro',desc:'Чертёжная синяя · основная',icon:'⌗'},
+  {id:'gold',name:'Gold Premium',desc:'Чёрный графит и тёплое золото',icon:'✦'},
+  {id:'orange',name:'Orange Industrial',desc:'Антрацит и промышленный оранжевый',icon:'◈'},
+  {id:'green',name:'Neon Green CNC',desc:'Тёмный металл и зелёный неон',icon:'⬡'},
+  {id:'steel',name:'Brushed Steel',desc:'Шлифованная нержавеющая сталь',icon:'▤'}
+];
 function showSettings() {
-  openModal('Настройки',`<h3>Цветовая тема</h3><div class="choices"><button type="button" class="choice-button" id="theme-dark">Тёмная</button><button type="button" class="choice-button" id="theme-light">Светлая</button></div>
-  <h3>Выбранная резьба</h3><div class="stat-chip"><span id="current-selection">${fullLabel(state.d,state.p)}</span><b>Ø ${num(drillFor(state.d,state.p).diameter)} мм</b></div>
-  <button class="light-action" type="button" id="reset-choice">Сбросить выбор на М10×1,5</button><p class="dialog-hint" id="settings-feedback">Выбранная резьба и тема сохраняются только на этом устройстве.</p>`,()=>{
-    function activeTheme(){for(const theme of ['dark','light']) $('theme-'+theme).classList.toggle('active',state.theme===theme);}
-    for(const theme of ['dark','light']) $('theme-'+theme).addEventListener('click',()=>{setTheme(theme);activeTheme()});
-    $('reset-choice').addEventListener('click',()=>{state.tab='common';selectThread(10,1.5);$('settings-feedback').textContent='Выбор сброшен на М10×1,5';$('current-selection').textContent='M10 × 1.5';});
-    activeTheme();
-  });
+  openModal('Настройки оформления',`<p class="theme-modal-lead">Выбери внешний вид приложения. Темы переключаются сразу и сохраняются для офлайн-работы.</p>
+    <div class="theme-picker" id="theme-picker" role="radiogroup" aria-label="Тема приложения"></div>
+    <h3>Текущие параметры</h3>
+    <div class="stat-chip"><span id="current-selection">${fullLabel(state.d,state.p)}</span><b>Ø ${num(drillFor(state.d,state.p).diameter)} мм</b></div>
+    <button class="light-action" type="button" id="reset-choice">Вернуть выбор М10×1,5</button>
+    <p class="dialog-hint" id="settings-feedback">Оформление и выбранная резьба сохраняются на этом устройстве.</p>`,()=>{
+      const parent=$('theme-picker');
+      function renderThemeChoices(){
+        parent.replaceChildren(...THEMES.map(theme=>{
+          const button=document.createElement('button');button.type='button';button.className='theme-choice';
+          button.dataset.themeChoice=theme.id;button.setAttribute('role','radio');
+          const selected=state.theme===theme.id;
+          button.setAttribute('aria-checked',String(selected));
+          if(selected)button.classList.add('selected');
+          button.innerHTML=`<span class="theme-miniature theme-miniature-${theme.id}" aria-hidden="true"><span></span><i></i><b></b></span><span class="theme-copy"><strong>${theme.name}</strong><small>${theme.desc}</small></span><span class="theme-radio" aria-hidden="true">${selected?'✓':''}</span>`;
+          button.addEventListener('click',()=>{setTheme(theme.id);renderThemeChoices();});
+          return button;
+        }));
+      }
+      $('reset-choice').addEventListener('click',()=>{state.tab='common';selectThread(10,1.5);$('settings-feedback').textContent='Выбор сброшен на М10×1,5';$('current-selection').textContent='M10 × 1.5';});
+      renderThemeChoices();
+    });
 }
 function clearSelection() {
   // Close only the result panel. A thread tap reopens it instantly.
@@ -286,10 +310,7 @@ async function registerOffline() {
   }
   catch {$('online-status').textContent='OFFLINE ПОСЛЕ HTTPS';}
 }
-// Do not reopen the PWA partway down the page: the iPhone status bar can cover the heading.
-if ('scrollRestoration' in history) history.scrollRestoration='manual';
-window.addEventListener('pageshow',()=>requestAnimationFrame(()=>window.scrollTo(0,0)));
-restore();state.page=Math.max(0,Math.floor(sizesFor(state.tab).indexOf(state.d)/PAGE_SIZE));setTheme(state.theme);updateTabs();drawGrid();drawResult();initEvents();networkState();
+restore();setTheme(state.theme);updateTabs();drawGrid();drawResult();initEvents();networkState();
 window.addEventListener('online',networkState);window.addEventListener('offline',networkState);
 if(location.protocol.startsWith('http')) registerOffline();
 else $('online-status').textContent='НУЖЕН HTTPS';
