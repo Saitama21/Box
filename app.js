@@ -255,7 +255,7 @@ function initEvents() {
       else if(!e.shiftKey && document.activeElement===items.at(-1)){e.preventDefault();items[0].focus();}
     }
   });
-  $('dock-threads').addEventListener('click',()=>{closeModal();$('thread-grid').scrollIntoView({behavior:'smooth',block:'nearest'});});
+  $('dock-threads').addEventListener('click',()=>{closeModal();window.scrollTo({top:0,behavior:'smooth'});});
   $('dock-hole').addEventListener('click',showHole);
   $('dock-sizes').addEventListener('click',showGeometry);
   $('dock-table').addEventListener('click',showTable);
@@ -276,6 +276,9 @@ async function registerOffline() {
   }
   catch {$('online-status').textContent='OFFLINE ПОСЛЕ HTTPS';}
 }
+// Do not reopen the PWA partway down the page: the iPhone status bar can cover the heading.
+if ('scrollRestoration' in history) history.scrollRestoration='manual';
+window.addEventListener('pageshow',()=>requestAnimationFrame(()=>window.scrollTo(0,0)));
 restore();setTheme(state.theme);updateTabs();drawGrid();drawResult();initEvents();networkState();
 window.addEventListener('online',networkState);window.addEventListener('offline',networkState);
 if(location.protocol.startsWith('http')) registerOffline();
