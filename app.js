@@ -4,7 +4,8 @@
 const {THREADS, POPULAR, findThread, drillFor} = window.CNC_THREAD_DATA;
 const $ = id => document.getElementById(id);
 const $grid = $('thread-grid');
-const state = { tab:'common', d:10, p:1.5, theme:'dark', modal:null, opener:null };
+const state = { tab:'common', d:10, p:1.5, theme:'dark', modal:null, opener:null, page:0 };
+const PAGE_SIZE=16;
 const FINE_SIZES = [3,4,5,6,8,10,12,14,16,18,20,22,24,27,30,33,36];
 const num = n => Number(n).toLocaleString('en-US', {maximumFractionDigits:2, useGrouping:false});
 const label = n => `M${num(n)}`;
@@ -43,11 +44,14 @@ function updateTabs() {
     btn.setAttribute('aria-selected',String(selected));
   });
   $('list-caption').textContent= state.tab==='fine'?'ВЫБЕРИ РАЗМЕР ДЛЯ МЕЛКОГО ШАГА':state.tab==='other'?'ДОПОЛНИТЕЛЬНЫЕ РАЗМЕРЫ':'ВЫБЕРИ РАЗМЕР РЕЗЬБЫ';
-  $('all-sizes').textContent = state.tab==='other'?'Популярные ↗':'Все размеры ↗';
+  const pageTotal=Math.ceil(sizesFor(state.tab).length/PAGE_SIZE);
+  $('all-sizes').textContent=pageTotal>1?`Далее ${state.page+1}/${pageTotal} →`:'Все размеры ↗';
 }
 function drawGrid() {
   const fragment=document.createDocumentFragment();
-  for(const d of sizesFor(state.tab)) {
+  const choices=sizesFor(state.tab);
+  state.page=Math.min(state.page,Math.max(0,Math.ceil(choices.length/PAGE_SIZE)-1));
+  for(const d of choices.slice(state.page*PAGE_SIZE,(state.page+1)*PAGE_SIZE)) {
     const b=document.createElement('button');
     b.type='button';b.className='thread-btn';b.dataset.size=String(d);
     b.textContent=label(d);
@@ -60,7 +64,7 @@ function drawGrid() {
   $grid.replaceChildren(fragment);
 }
 function setTab(tab) {
-  state.tab=tab;
+  state.tab=tab;state.page=0;
   if(tab==='fine' && findThread(state.d)?.fine.length) {
     if(state.p===findThread(state.d).coarse) state.p=findThread(state.d).fine[0];
   }
@@ -70,6 +74,7 @@ function setTab(tab) {
   } else if(tab==='common' && !POPULAR.includes(state.d)) {
     const item=findThread(10);state.d=item.d;state.p=item.coarse;
   }
+  state.page=Math.max(0,Math.floor(sizesFor(tab).indexOf(state.d)/PAGE_SIZE));
   updateTabs();drawGrid();drawResult();persist();
 }
 function selectThread(d, requestedPitch) {
@@ -80,6 +85,7 @@ function selectThread(d, requestedPitch) {
     ? Number(requestedPitch)
     : (state.tab==='fine'&&item.fine.length?item.fine[0]:item.coarse);
   if(!sizesFor(state.tab).includes(item.d)) state.tab=POPULAR.includes(item.d)?'common':'other';
+  state.page=Math.max(0,Math.floor(sizesFor(state.tab).indexOf(state.d)/PAGE_SIZE));
   updateTabs();drawGrid();drawResult();persist();
 }
 function selectPitch(p) {
@@ -262,7 +268,11 @@ function enableAutoFadeDock() {
 }
 function initEvents() {
   document.querySelectorAll('.mode-tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
-  $('all-sizes').addEventListener('click',()=>setTab(state.tab==='other'?'common':'other'));
+  $('all-sizes').addEventListener('click',()=>{
+    const pages=Math.ceil(sizesFor(state.tab).length/PAGE_SIZE);
+    if(pages>1){state.page=(state.page+1)%pages;updateTabs();drawGrid();}
+    else setTab('other');
+  });
   $('search-open').addEventListener('click',showSearch);
   $('settings-open').addEventListener('click',showSettings);
   $('clear-selection').addEventListener('click',clearSelection);
@@ -301,7 +311,7 @@ async function registerOffline() {
 // Do not reopen the PWA partway down the page: the iPhone status bar can cover the heading.
 if ('scrollRestoration' in history) history.scrollRestoration='manual';
 window.addEventListener('pageshow',()=>requestAnimationFrame(()=>window.scrollTo(0,0)));
-restore();setTheme(state.theme);updateTabs();drawGrid();drawResult();initEvents();enableAutoFadeDock();networkState();
+restore();state.page=Math.max(0,Math.floor(sizesFor(state.tab).indexOf(state.d)/PAGE_SIZE));setTheme(state.theme);updateTabs();drawGrid();drawResult();initEvents();enableAutoFadeDock();networkState();
 window.addEventListener('online',networkState);window.addEventListener('offline',networkState);
 if(location.protocol.startsWith('http')) registerOffline();
 else $('online-status').textContent='НУЖЕН HTTPS';

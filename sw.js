@@ -1,5 +1,5 @@
 /* Offline-first app shell; relative URLs work on GitHub Pages project paths. */
-const CACHE='cnc-thread-drill-v2-20261023-dock-fade-1';
+const CACHE='cnc-thread-drill-v2-20261023-one-screen-1';
 const CORE=['./','./index.html','./styles.css','./app.js','./data.js','./manifest.webmanifest','./icons/favicon.svg','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png','./assets/twist-drill.webp','./assets/threaded-bore.webp','./assets/cutting-tap.webp'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
