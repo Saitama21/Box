@@ -241,11 +241,12 @@ const THEMES = [
   {id:'steel',name:'Brushed Steel',desc:'Шлифованная нержавеющая сталь',icon:'▤'}
 ];
 function showSettings() {
-  openModal('Настройки оформления',`<p class="theme-modal-lead">Выбери внешний вид приложения. Темы переключаются сразу и сохраняются для офлайн-работы.</p>
+  openModal('Настройки оформления',`<p class="theme-modal-lead">Версия 3.1 · 5 тем. Выбери оформление — оно сохранится и будет доступно без интернета.</p>
     <div class="theme-picker" id="theme-picker" role="radiogroup" aria-label="Тема приложения"></div>
     <h3>Текущие параметры</h3>
     <div class="stat-chip"><span id="current-selection">${fullLabel(state.d,state.p)}</span><b>Ø ${num(drillFor(state.d,state.p).diameter)} мм</b></div>
     <button class="light-action" type="button" id="reset-choice">Вернуть выбор М10×1,5</button>
+    <button class="light-action" type="button" id="check-update">Проверить обновление</button>
     <p class="dialog-hint" id="settings-feedback">Оформление и выбранная резьба сохраняются на этом устройстве.</p>`,()=>{
       const parent=$('theme-picker');
       function renderThemeChoices(){
@@ -261,6 +262,18 @@ function showSettings() {
         }));
       }
       $('reset-choice').addEventListener('click',()=>{state.tab='common';selectThread(10,1.5);$('settings-feedback').textContent='Выбор сброшен на М10×1,5';$('current-selection').textContent='M10 × 1.5';});
+      $('check-update').addEventListener('click',async()=>{
+        const feedback=$('settings-feedback');
+        feedback.textContent='Проверяю новую версию…';
+        try {
+          if('serviceWorker' in navigator){
+            const registration=await navigator.serviceWorker.getRegistration('./');
+            if(registration) await registration.update();
+          }
+          feedback.textContent='Проверка завершена. Обновляю приложение…';
+          location.reload();
+        } catch { feedback.textContent='Не удалось проверить обновления. Проверь интернет и повтори.'; }
+      });
       renderThemeChoices();
     });
 }
@@ -302,7 +315,18 @@ function networkState() {
 async function registerOffline() {
   if(!('serviceWorker' in navigator)){$('online-status').textContent='ЛОКАЛЬНО';return;}
   try {
-    await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+    const hadController=Boolean(navigator.serviceWorker.controller);
+    let reloading=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      // Reload only when replacing an existing SW, not during first-time installation.
+      if(hadController && !reloading){reloading=true;location.reload();}
+    });
+    const registration=await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
+    // Explicit update check on each launch; avoids long-lived Safari SW caches.
+    registration.update().catch(()=>{});
+    document.addEventListener('visibilitychange',()=>{
+      if(!document.hidden && navigator.onLine) registration.update().catch(()=>{});
+    });
     await navigator.serviceWorker.ready;
     const keys=await caches.keys();
     offlineReady=keys.some(key=>key.startsWith('cnc-thread-drill-v3-'));
